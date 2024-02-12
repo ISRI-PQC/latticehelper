@@ -5,9 +5,8 @@ mkdir -p swigbuild
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-GMP_PREFIX=/opt/homebrew/opt/gmp
 LIBOQS_ROOT=$script_dir/liboqs
-NTL_ROOT=$script_dir/ntl
+NFL_ROOT=$script_dir/NFLlib
 
 
 # Ensure libOQS is built
@@ -23,22 +22,23 @@ else \
     cmake -GNinja -B $LIBOQS_ROOT/build $LIBOQS_ROOT && ninja -j $(nproc) -C $LIBOQS_ROOT/build; \
 fi
 
-# Ensure NTL is built
-if [[ -e "$NTL_ROOT" ]]; then
-    echo "ntl directory already exists, skipping cloning"; \
+# Ensure NFL is built
+if [[ -e "$NFL_ROOT" ]]; then
+    echo "NFLlib directory already exists, skipping cloning"; \
 else \
-    git clone -b main https://github.com/libntl/ntl.git; \
+    git clone https://github.com/Muzosh/NFLlib; \
 fi
 
-if [[ -e "$NTL_ROOT/lib/libntl.a" ]]; then
-    echo "ntl library already builded, skipping compilation"; \
+if [[ -e "$NFL_ROOT/lib/libNFLlib.a" ]]; then
+    echo "NFLlib library already builded, skipping compilation"; \
 else \
     (
-        cd ntl/src \
-        && ./configure GMP_PREFIX=$GMP_PREFIX \
+        cd NFLlib \
+        && mkdir _build \
+        && cd _build \
+        && cmake .. -DCMAKE_BUILD_TYPE=Release -DNFL_OPTIMIZED=ON -DNFLLIB_USE_AVX=ON \
         && make \
-        && mkdir -p ../lib \
-        && cp ntl.a ../lib/libntl.a
+        && cp libnfllib_static.a ../lib/libNFLlib.a
     ); \
 fi
 
@@ -52,12 +52,12 @@ if [ "$1" = "python" ]; then
     swig -python -c++ -o ./swigbuild/python/pqdevkit_wrap.cxx -I$LIBOQS_ROOT/build/include pqdevkit.i && \
 
     # Compile the C++ wrapper and link it with liboqs
-    g++ -std=c++20 -O2 -fPIC -I$LIBOQS_ROOT/build/include -I$NTL_ROOT/include $(python-config --cflags) -c ./swigbuild/python/pqdevkit_wrap.cxx -o ./swigbuild/python/pqdevkit_wrap.o && \
-    # Manual working version: g++ -std=c++20 -O2 -fPIC -I$LIBOQS_ROOT/build/include -I$NTL_ROOT/include -I/Users/petr/.pyenv/versions/3.11.5/include/python3.11 -c ./swigbuild/python/pqdevkit_wrap.cxx -o ./swigbuild/python/pqdevkit_wrap.o
+    g++ -std=c++20 -O2 -fPIC -I$LIBOQS_ROOT/build/include -I$NFL_ROOT/include $(python-config --cflags) -c ./swigbuild/python/pqdevkit_wrap.cxx -o ./swigbuild/python/pqdevkit_wrap.o && \
+    # Manual working version:g++ -std=c++20 -O2 -fPIC -I$LIBOQS_ROOT/build/include -I$NFL_ROOT/include -I/Users/petr/.pyenv/versions/3.11.5/include/python3.11 -c ./swigbuild/python/pqdevkit_wrap.cxx -o ./swigbuild/python/pqdevkit_wrap.o
 
-    # Link the C++ wrapper with liboqs, libntl and Python+OpenSSL+Intl
-    g++ -std=c++20 -shared ./swigbuild/python/pqdevkit_wrap.o -L$LIBOQS_ROOT/build/lib -loqs -L$NTL_ROOT/lib -lntl -L$(python-config --prefix)/lib -l$(ls $(python-config --prefix)/lib | grep -o 'python[0-9]\+\.[0-9]\+' | tail -1) -lssl -lcrypto -o ./swigbuild/python/pqdevkit.so; \
-    # Manual working version: g++ -std=c++20 -shared ./swigbuild/python/pqdevkit_wrap.o -L$LIBOQS_ROOT/build/lib -loqs -L$NTL_ROOT/lib -lntl -L/Users/petr/.pyenv/versions/3.11.5/lib -lpython3.11 -L/opt/homebrew/lib -lintl -L/opt/homebrew/opt/openssl@1.1/lib -lssl -lcrypto -o ./swigbuild/python/pqdevkit.so
+    # Link the C++ wrapper with liboqs, libNFLlib and Python+OpenSSL+INFLlib
+    g++ -std=c++20 -shared ./swigbuild/python/pqdevkit_wrap.o -L$LIBOQS_ROOT/build/lib -loqs -L$NFL_ROOT/lib -lNFLlib -L$(python-config --prefix)/lib -l$(ls $(python-config --prefix)/lib | grep -o 'python[0-9]\+\.[0-9]\+' | tail -1) -lssl -lcrypto -o ./swigbuild/python/pqdevkit.so; \
+    # Manual working version: g++ -std=c++20 -shared ./swigbuild/python/pqdevkit_wrap.o -L$LIBOQS_ROOT/build/lib -loqs -L$NFL_ROOT/lib -lNFLlib -L/Users/petr/.pyenv/versions/3.11.5/lib -lpython3.11 -L/opt/homebrew/lib -liNFLlib -L/opt/homebrew/opt/openssl@1.1/lib -lssl -lcrypto -o ./swigbuild/python/pqdevkit.so
 
 elif [ "$1" = "go" ]; then
     echo "Building Go extension.."; \
@@ -65,7 +65,7 @@ elif [ "$1" = "go" ]; then
     rm -rf swigbuild/go; \
     mkdir -p swigbuild/go; \
     
-    swig -go -cgo -intgosize 64 -c++ -o ./swigbuild/go/oqsgo_wrap.cpp -I$LIBOQS_ROOT/build/include -I$LIBNTL_ROOT pqdevkit.i
+    swig -go -cgo -intgosize 64 -c++ -o ./swigbuild/go/oqsgo_wrap.cpp -I$LIBOQS_ROOT/build/include -I$LIBNFL_ROOT pqdevkit.i
 else
     echo "Usage: build.sh [python|go]"; \
     exit 1; \

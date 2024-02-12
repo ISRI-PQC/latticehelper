@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "*.log": "json",
+        "*.module": "php",
+        "__config": "cpp",
+        "functional": "cpp",
+        "__hash_table": "cpp",
+        "algorithm": "cpp",
+        "atomic": "cpp",
+        "locale": "cpp",
+        "string": "cpp",
+        "tuple": "cpp",
+        "unordered_map": "cpp",
+        "variant": "cpp",
+        "vector": "cpp"
+    }
+}
