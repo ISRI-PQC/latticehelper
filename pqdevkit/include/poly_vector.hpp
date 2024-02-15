@@ -7,13 +7,19 @@
 // TODO: consider using classes and having private members
 namespace pqdevkit
 {
-    struct PolyVector
+    class PolyVector
     {
+    private:
         std::unique_ptr<std::vector<PolyProxy>> poly_vector_ptr;
 
+    public:
         PolyVector(std::initializer_list<std::initializer_list<coeff_type>> poly_vector); // {{1,2,3}, {4,5,6}}
         PolyVector(const std::vector<PolyProxy> &poly_vector);
         ~PolyVector();
+
+        std::vector<PolyProxy>& get_vector() const;
+
+        size_t length() const;
 
         coeff_type infinite_norm() const;
         std::vector<coeff_type> listize() const;

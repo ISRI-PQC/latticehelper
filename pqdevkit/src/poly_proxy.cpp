@@ -2,25 +2,37 @@
 
 namespace pqdevkit
 {
-    // PolyProxy
+    /// @brief DOES convert to NTT
+    /// @param constant
     PolyProxy::PolyProxy(coeff_type constant)
     {
-        this->poly_p = std::make_unique<poly_type>(constant);
-        this->poly_p->ntt_pow_phi();
+        poly_ptr = std::make_unique<poly_type>(constant);
+        poly_ptr->ntt_pow_phi();
     }
 
+    /// @brief DOES convert to NTT
+    /// @param coefficients
     PolyProxy::PolyProxy(std::initializer_list<coeff_type> coefficients)
     {
-        this->poly_p = std::make_unique<poly_type>(coefficients);
-        this->poly_p->ntt_pow_phi();
+        poly_ptr = std::make_unique<poly_type>(coefficients);
+        poly_ptr->ntt_pow_phi();
     }
 
-    PolyProxy::PolyProxy(const poly_type &poly_p)
+    /// @brief DOES NOT convert to NTT
+    /// @param poly
+    PolyProxy::PolyProxy(const poly_type &poly)
     {
-        this->poly_p = std::make_unique<poly_type>(poly_p);
+        poly_ptr = std::make_unique<poly_type>(poly);
     }
 
     PolyProxy::~PolyProxy() {}
+
+    /// @brief
+    /// @return
+    poly_type &PolyProxy::get_poly() const
+    {
+        return *poly_ptr;
+    }
 
     coeff_type PolyProxy::infinite_norm() const
     {
@@ -36,17 +48,17 @@ namespace pqdevkit
 
     PolyProxy PolyProxy::operator+(const PolyProxy &other) const
     {
-        return PolyProxy(poly_type(*this->poly_p + *other.poly_p));
+        return poly_type(*poly_ptr + *other.poly_ptr);
     }
 
     PolyProxy PolyProxy::operator-(const PolyProxy &other) const
     {
-        return PolyProxy(poly_type(*this->poly_p - *other.poly_p));
+        return poly_type(*poly_ptr - *other.poly_ptr);
     }
 
     PolyProxy PolyProxy::operator*(const PolyProxy &other) const
     {
-        return PolyProxy(poly_type(*this->poly_p * *other.poly_p));
+        return poly_type(*poly_ptr * *other.poly_ptr);
     }
 
     PolyProxy PolyProxy::operator*(const coeff_type &scalar) const
@@ -56,6 +68,6 @@ namespace pqdevkit
 
     PolyProxy PolyProxy::random_poly()
     {
-        return PolyProxy(poly_type(nfl::uniform()));
+        return poly_type(nfl::uniform());
     }
 } // namespace pqdevkit

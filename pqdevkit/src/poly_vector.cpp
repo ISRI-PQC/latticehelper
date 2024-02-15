@@ -6,16 +6,19 @@ namespace pqdevkit
     // PolyVector
     PolyVector::PolyVector(std::initializer_list<std::initializer_list<coeff_type>> poly_vector)
     {
-        this->poly_vector_ptr = std::make_unique<std::vector<PolyProxy>>(poly_vector);
+        poly_vector_ptr = std::make_unique<std::vector<PolyProxy>>(poly_vector);
     }
 
     PolyVector::PolyVector(const std::vector<PolyProxy> &poly_vector)
     {
-        this->poly_vector_ptr = std::make_unique<std::vector<PolyProxy>>(poly_vector);
+        poly_vector_ptr = std::make_unique<std::vector<PolyProxy>>(poly_vector);
     }
 
-    PolyVector::~PolyVector()
+    PolyVector::~PolyVector() {}
+
+    std::vector<PolyProxy> &PolyVector::get_vector() const
     {
+        return *poly_vector_ptr;
     }
 
     coeff_type PolyVector::infinite_norm() const
@@ -32,6 +35,11 @@ namespace pqdevkit
         }
 
         return maxNorm;
+    }
+
+    size_t PolyVector::length() const
+    {
+        return (*poly_vector_ptr).size();
     }
 
     std::vector<coeff_type> PolyVector::listize() const
@@ -56,7 +64,7 @@ namespace pqdevkit
             scaledPolyVector.push_back(polyProxy * scalar);
         }
 
-        return PolyVector(scaledPolyVector);
+        return scaledPolyVector;
     }
 
     PolyVector PolyVector::scale(const poly_type &poly) const
@@ -68,7 +76,7 @@ namespace pqdevkit
             scaledPolyVector.push_back(polyProxy * poly);
         }
 
-        return PolyVector(scaledPolyVector);
+        return scaledPolyVector;
     }
 
     PolyVector PolyVector::operator+(const PolyVector &other) const
@@ -82,10 +90,11 @@ namespace pqdevkit
 
         for (size_t i = 0; i < poly_vector_ptr->size(); i++)
         {
-            result.push_back((*poly_vector_ptr)[i] + (*other.poly_vector_ptr)[i]);
+            result.push_back(
+                poly_vector_ptr->at(i) + other.poly_vector_ptr->at(i));
         }
 
-        return PolyVector(result);
+        return result;
     }
 
     PolyVector PolyVector::operator-(const PolyVector &other) const
@@ -99,7 +108,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < poly_vector_ptr->size(); i++)
         {
-            result.push_back((*poly_vector_ptr)[i] - (*other.poly_vector_ptr)[i]);
+            result.push_back(poly_vector_ptr->at(i) - other.poly_vector_ptr->at(i));
         }
 
         return PolyVector(result);
@@ -136,11 +145,11 @@ namespace pqdevkit
             throw std::runtime_error("PolyVector::operator*: PolyVectors must have the same length");
         }
 
-        PolyProxy result = PolyProxy(0);
+        poly_type result;
 
         for (size_t i = 0; i < poly_vector_ptr->size(); i++)
         {
-            result = result + ((*poly_vector_ptr)[i] * (*other.poly_vector_ptr)[i]);
+            result = result + (poly_vector_ptr->at(i).get_poly() * other.poly_vector_ptr->at(i).get_poly());
         }
 
         return result;
@@ -148,16 +157,24 @@ namespace pqdevkit
 
     PolyVector PolyVector::operator*(const PolyMatrix &other) const
     {
-        if (poly_vector_ptr->size() != other.poly_matrix_ptr->size())
+        if (poly_vector_ptr->size() != other.cols())
         {
             throw std::runtime_error("PolyVector::operator*: PolyVector and PolyMatrix must have the same length");
         }
 
         std::vector<PolyProxy> result;
 
-        for (size_t i = 0; i < poly_vector_ptr->size(); i++)
+        for (size_t i = 0; i < other.rows(); i++)
         {
-            result.push_back((*poly_vector_ptr)[i] * (*other.poly_matrix_ptr)[i]);
+            poly_type current;
+
+            for (size_t j = 0; j < poly_vector_ptr->size(); j++)
+            {
+                current = current + (poly_vector_ptr->at(j).get_poly() *
+                                     other.get_matrix()[i].get_vector()[j].get_poly());
+            }
+
+            result.push_back(PolyProxy(current));
         }
 
         return PolyVector(result);
@@ -165,7 +182,12 @@ namespace pqdevkit
 
     PolyVector PolyVector::operator*(const coeff_type &scalar) const
     {
-        return this->scale(scalar);
+        return scale(scalar);
+    }
+
+    PolyVector operator*(const coeff_type &scalar, const PolyVector &poly_vector)
+    {
+        return poly_vector.scale(scalar);
     }
 
     PolyVector PolyVector::random_poly_vector(size_t length)
@@ -178,11 +200,6 @@ namespace pqdevkit
         }
 
         return PolyVector(result);
-    }
-
-    PolyVector operator*(const coeff_type &scalar, const PolyVector &poly_vector)
-    {
-        return poly_vector.scale(scalar);
     }
 
 } // namespace pqdevkit

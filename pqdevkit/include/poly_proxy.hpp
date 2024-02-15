@@ -17,16 +17,21 @@ namespace pqdevkit
     using coeff_type = typename poly_type::value_type;
 
     // TODO: make this a template for easy switching of the math library
-    struct PolyProxy
+    class PolyProxy
     {
+    private:
+        std::unique_ptr<poly_type> poly_ptr;
+
+    public:
         unsigned short degree = PQDEVKIT_DEGREE;
         size_t coeff_modulus = PQDEVKIT_COEFF_MODULUS;
-        std::unique_ptr<poly_type> poly_p;
 
         PolyProxy(coeff_type constant);
         PolyProxy(std::initializer_list<coeff_type> coefficients); // {1,2,3}
-        PolyProxy(const poly_type &poly_p);
+        PolyProxy(const poly_type &poly);
         ~PolyProxy();
+
+        poly_type& get_poly() const;
 
         coeff_type infinite_norm() const;
         std::vector<coeff_type> listize() const;
