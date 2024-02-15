@@ -2,8 +2,6 @@
 #define PQDEVKIT_POLY_PROXY_HPP
 
 #include <limits>
-
-#include "nfl.hpp"
 #include "params.hpp"
 
 // TODO: consider using classes and having private members
@@ -11,10 +9,9 @@
 // what about scaling with scalar?
 namespace pqdevkit
 {
-    using poly_type =
-        nfl::poly_from_modulus<uint64_t, PQDEVKIT_DEGREE,
-                               nfl::params<uint64_t>::kModulusBitsize>;
-    using coeff_type = typename poly_type::value_type;
+    // NFL specific
+    using poly_type = PQDEVKIT_POLY_TYPE;
+    using coeff_type = PQDEVKIT_COEFF_TYPE;
 
     // TODO: make this a template for easy switching of the math library
     class PolyProxy
@@ -31,7 +28,7 @@ namespace pqdevkit
         PolyProxy(const poly_type &poly);
         ~PolyProxy();
 
-        poly_type& get_poly() const;
+        poly_type &get_poly() const;
 
         coeff_type infinite_norm() const;
         std::vector<coeff_type> listize() const;
