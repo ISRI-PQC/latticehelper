@@ -28,7 +28,7 @@ namespace pqdevkit
 
     size_t PolyMatrix::rows() const
     {
-        return poly_matrix_ptr->.size();
+        return poly_matrix_ptr->size();
     }
 
     size_t PolyMatrix::cols() const

@@ -4,7 +4,6 @@
 #include <limits>
 #include "params.hpp"
 
-// TODO: consider using classes and having private members
 // TODO: consider not using PolyProxy at all and specify helper functions -
 // what about scaling with scalar?
 namespace pqdevkit
