@@ -6,7 +6,7 @@ namespace pqdevkit
     /// @param constant
     PolyProxy::PolyProxy(coeff_type constant)
     {
-        poly_ptr = std::make_unique<poly_type>(constant);
+        poly_ptr = std::unique_ptr<poly_type>(new poly_type(constant));
         poly_ptr->ntt_pow_phi();
     }
 
@@ -14,7 +14,7 @@ namespace pqdevkit
     /// @param coefficients
     PolyProxy::PolyProxy(std::initializer_list<coeff_type> coefficients)
     {
-        poly_ptr = std::make_unique<poly_type>(coefficients);
+        poly_ptr = std::unique_ptr<poly_type>(new poly_type(coefficients));
         poly_ptr->ntt_pow_phi();
     }
 
@@ -22,7 +22,14 @@ namespace pqdevkit
     /// @param poly
     PolyProxy::PolyProxy(const poly_type &poly)
     {
-        poly_ptr = std::make_unique<poly_type>(poly);
+        poly_ptr = std::unique_ptr<poly_type>(new poly_type(poly));
+    }
+
+    /// @brief DOES NOT convert to NTT
+    /// @param other 
+    PolyProxy::PolyProxy(const PolyProxy &other)
+    {
+        poly_ptr = std::unique_ptr<poly_type>(new poly_type(*other.poly_ptr));
     }
 
     PolyProxy::~PolyProxy() {}

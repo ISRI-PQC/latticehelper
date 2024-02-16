@@ -11,12 +11,17 @@ namespace pqdevkit
             result.push_back(PolyVector(row));
         }
 
-        poly_matrix_ptr = std::make_unique<std::vector<PolyVector>>(result);
+        poly_matrix_ptr = std::unique_ptr<std::vector<PolyVector>>(new std::vector<PolyVector>(result));
     }
 
     PolyMatrix::PolyMatrix(const std::vector<PolyVector> &poly_matrix)
     {
-        poly_matrix_ptr = std::make_unique<std::vector<PolyVector>>(poly_matrix);
+        poly_matrix_ptr = std::unique_ptr<std::vector<PolyVector>>(new std::vector<PolyVector>(poly_matrix));
+    }
+
+    PolyMatrix::PolyMatrix(const PolyMatrix &other)
+    {
+        poly_matrix_ptr = std::unique_ptr<std::vector<PolyVector>>(new std::vector<PolyVector>(*other.poly_matrix_ptr));
     }
 
     PolyMatrix::~PolyMatrix() {}

@@ -1,17 +1,29 @@
 #include "poly_vector.hpp"
+#include "poly_matrix.hpp"
 
 namespace pqdevkit
 {
-
     // PolyVector
     PolyVector::PolyVector(std::initializer_list<std::initializer_list<coeff_type>> poly_vector)
     {
-        poly_vector_ptr = std::make_unique<std::vector<PolyProxy>>(poly_vector);
+        std::vector<PolyProxy> result;
+
+        for (auto poly : poly_vector)
+        {
+            result.push_back(PolyProxy(poly));
+        }
+
+        poly_vector_ptr = std::unique_ptr<std::vector<PolyProxy>>(new std::vector<PolyProxy>(result));
     }
 
     PolyVector::PolyVector(const std::vector<PolyProxy> &poly_vector)
     {
-        poly_vector_ptr = std::make_unique<std::vector<PolyProxy>>(poly_vector);
+        poly_vector_ptr = std::unique_ptr<std::vector<PolyProxy>>(new std::vector<PolyProxy>(poly_vector));
+    }
+
+    PolyVector::PolyVector(const PolyVector &other)
+    {
+        poly_vector_ptr = std::unique_ptr<std::vector<PolyProxy>>(new std::vector<PolyProxy>(*other.poly_vector_ptr));
     }
 
     PolyVector::~PolyVector() {}

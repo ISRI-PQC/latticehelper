@@ -1,12 +1,15 @@
 #ifndef PQDEVKIT_POLY_VECTOR_HPP
 #define PQDEVKIT_POLY_VECTOR_HPP
 
-#include "poly_matrix.hpp"
+#include <memory>
+#include "params.hpp"
 #include "poly_proxy.hpp"
 
 // TODO: consider using classes and having private members
 namespace pqdevkit
 {
+    class PolyMatrix;
+
     class PolyVector
     {
     private:
@@ -15,6 +18,7 @@ namespace pqdevkit
     public:
         PolyVector(std::initializer_list<std::initializer_list<coeff_type>> poly_vector); // {{1,2,3}, {4,5,6}}
         PolyVector(const std::vector<PolyProxy> &poly_vector);
+        PolyVector(const PolyVector &other);
         ~PolyVector();
 
         std::vector<PolyProxy>& get_vector() const;

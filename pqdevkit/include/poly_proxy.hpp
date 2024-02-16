@@ -1,6 +1,7 @@
 #ifndef PQDEVKIT_POLY_PROXY_HPP
 #define PQDEVKIT_POLY_PROXY_HPP
 
+#include <memory>
 #include <limits>
 #include "params.hpp"
 
@@ -25,6 +26,7 @@ namespace pqdevkit
         PolyProxy(coeff_type constant);
         PolyProxy(std::initializer_list<coeff_type> coefficients); // {1,2,3}
         PolyProxy(const poly_type &poly);
+        PolyProxy(const PolyProxy &other);
         ~PolyProxy();
 
         poly_type &get_poly() const;

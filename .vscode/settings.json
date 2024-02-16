@@ -85,7 +85,14 @@
         "span": "cpp",
         "stack": "cpp",
         "__tree": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "strstream": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "fstream": "cpp",
+        "semaphore": "cpp",
+        "thread": "cpp",
+        "typeindex": "cpp"
     },
     "cmake.configureOnOpen": false,
     "C_Cpp.errorSquiggles": "enabled"
