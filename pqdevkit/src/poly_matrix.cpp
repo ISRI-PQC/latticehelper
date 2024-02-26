@@ -80,7 +80,7 @@ namespace pqdevkit
 
             for (size_t j = 0; j < rows(); j++)
             {
-                currentColumn.push_back(this->poly_matrix.at(j).get_vector()[i]);
+                currentColumn.push_back(this->poly_matrix[j].get_vector()[i]);
             }
 
             result.push_back(PolyVector(currentColumn));
@@ -124,7 +124,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(this->poly_matrix.at(i) + other.poly_matrix.at(i));
+            result.push_back(this->poly_matrix[i] + other.poly_matrix[i]);
         }
 
         return PolyMatrix(result);
@@ -141,7 +141,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(this->poly_matrix.at(i) - other.poly_matrix.at(i));
+            result.push_back(this->poly_matrix[i] - other.poly_matrix[i]);
         }
 
         return PolyMatrix(result);
@@ -158,7 +158,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(this->poly_matrix.at(i) | other.poly_matrix.at(i));
+            result.push_back(this->poly_matrix[i] | other.poly_matrix[i]);
         }
 
         return PolyMatrix(result);
@@ -175,7 +175,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(this->poly_matrix.at(i));
+            result.push_back(this->poly_matrix[i]);
         }
 
         for (size_t i = 0; i < other.rows(); i++)
@@ -205,7 +205,7 @@ namespace pqdevkit
 
                 for (size_t k = 0; k < cols(); k++)
                 {
-                    current = current + (this->poly_matrix.at(i).get_vector()[k].get_poly() *
+                    current = current + (this->poly_matrix[i].get_vector()[k].get_poly() *
                                          other.transposed().get_matrix()[k].get_vector()[j].get_poly());
                 } // TODO: test this
 

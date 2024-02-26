@@ -80,7 +80,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            scaledPolyVector[i] = this->poly_vector.at(i) * scalar;
+            scaledPolyVector[i] = this->poly_vector[i] * scalar;
         }
 
         return scaledPolyVector;
@@ -92,7 +92,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            scaledPolyVector[i] = this->poly_vector.at(i) * poly;
+            scaledPolyVector[i] = this->poly_vector[i] * poly;
         }
 
         return scaledPolyVector;
@@ -109,7 +109,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            result[i] = this->poly_vector.at(i) + other.poly_vector.at(i);
+            result[i] = this->poly_vector[i] + other.poly_vector[i];
         }
 
         return result;
@@ -126,7 +126,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            result[i] = this->poly_vector.at(i) - other.poly_vector.at(i);
+            result[i] = this->poly_vector[i] - other.poly_vector[i];
         }
 
         return PolyVector(result);
@@ -144,12 +144,12 @@ namespace pqdevkit
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            result[i] = this->poly_vector.at(i);
+            result[i] = this->poly_vector[i];
         }
 
         for (size_t i = 0; i < other.poly_vector.size(); i++)
         {
-            result[i + this->poly_vector.size()] = other.poly_vector.at(i);
+            result[i + this->poly_vector.size()] = other.poly_vector[i];
         }
 
         return PolyVector(result);
@@ -167,7 +167,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            result = result + (this->poly_vector.at(i).get_poly() * other.poly_vector.at(i).get_poly());
+            result = result + (this->poly_vector[i].get_poly() * other.poly_vector[i].get_poly());
         }
 
         return result;
@@ -188,7 +188,7 @@ namespace pqdevkit
 
             for (size_t j = 0; j < this->poly_vector.size(); j++)
             {
-                current = current + (this->poly_vector.at(j).get_poly() *
+                current = current + (this->poly_vector[j].get_poly() *
                                      other.get_matrix()[i].get_vector()[j].get_poly());
             }
 
