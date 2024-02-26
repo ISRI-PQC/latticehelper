@@ -2,50 +2,50 @@
 
 namespace pqdevkit
 {
-    PolyMatrix::PolyMatrix(std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> poly_matrix)
+    PolyMatrix::PolyMatrix(std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other)
     {
         std::vector<PolyVector> result;
 
-        for (auto row : poly_matrix)
+        for (auto row : other)
         {
             result.push_back(PolyVector(row));
         }
 
-        poly_matrix_ptr = std::unique_ptr<std::vector<PolyVector>>(new std::vector<PolyVector>(result));
+        this->poly_matrix = result;
     }
 
-    PolyMatrix::PolyMatrix(const std::vector<PolyVector> &poly_matrix)
+    PolyMatrix::PolyMatrix(const std::vector<PolyVector> &other)
     {
-        poly_matrix_ptr = std::unique_ptr<std::vector<PolyVector>>(new std::vector<PolyVector>(poly_matrix));
+        this->poly_matrix = other;
     }
 
     PolyMatrix::PolyMatrix(const PolyMatrix &other)
     {
-        poly_matrix_ptr = std::unique_ptr<std::vector<PolyVector>>(new std::vector<PolyVector>(*other.poly_matrix_ptr));
+        this->poly_matrix = other.poly_matrix;
     }
 
     PolyMatrix::~PolyMatrix() {}
 
-    std::vector<PolyVector> PolyMatrix::get_matrix() const
+    const std::vector<PolyVector>& PolyMatrix::get_matrix() const
     {
-        return *poly_matrix_ptr;
+        return this->poly_matrix;
     }
 
     size_t PolyMatrix::rows() const
     {
-        return poly_matrix_ptr->size();
+        return this->poly_matrix.size();
     }
 
     size_t PolyMatrix::cols() const
     {
-        return poly_matrix_ptr->at(0).length();
+        return this->poly_matrix.at(0).length();
     }
 
     coeff_type PolyMatrix::infinite_norm() const
     {
         coeff_type maxNorm = std::numeric_limits<coeff_type>::min();
 
-        for (const auto &polyVector : *poly_matrix_ptr)
+        for (const auto &polyVector : this->poly_matrix)
         {
             coeff_type currentNorm = polyVector.infinite_norm();
             if (currentNorm > maxNorm)
@@ -61,7 +61,7 @@ namespace pqdevkit
     {
         std::vector<coeff_type> result;
 
-        for (const auto &polyVector : *poly_matrix_ptr)
+        for (const auto &polyVector : this->poly_matrix)
         {
             std::vector<coeff_type> currentList = polyVector.listize();
             result.insert(result.end(), currentList.begin(), currentList.end());
@@ -80,7 +80,7 @@ namespace pqdevkit
 
             for (size_t j = 0; j < rows(); j++)
             {
-                currentColumn.push_back(poly_matrix_ptr->at(j).get_vector()[i]);
+                currentColumn.push_back(this->poly_matrix.at(j).get_vector()[i]);
             }
 
             result.push_back(PolyVector(currentColumn));
@@ -93,7 +93,7 @@ namespace pqdevkit
     {
         std::vector<PolyVector> scaledPolyMatrix;
 
-        for (const auto &polyVector : *poly_matrix_ptr)
+        for (const auto &polyVector : this->poly_matrix)
         {
             scaledPolyMatrix.push_back(polyVector.scale(scalar));
         }
@@ -105,7 +105,7 @@ namespace pqdevkit
     {
         std::vector<PolyVector> scaledPolyMatrix;
 
-        for (const auto &polyVector : *poly_matrix_ptr)
+        for (const auto &polyVector : this->poly_matrix)
         {
             scaledPolyMatrix.push_back(polyVector.scale(poly));
         }
@@ -124,7 +124,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(poly_matrix_ptr->at(i) + other.poly_matrix_ptr->at(i));
+            result.push_back(this->poly_matrix.at(i) + other.poly_matrix.at(i));
         }
 
         return PolyMatrix(result);
@@ -141,7 +141,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(poly_matrix_ptr->at(i) - other.poly_matrix_ptr->at(i));
+            result.push_back(this->poly_matrix.at(i) - other.poly_matrix.at(i));
         }
 
         return PolyMatrix(result);
@@ -158,7 +158,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(poly_matrix_ptr->at(i) | other.poly_matrix_ptr->at(i));
+            result.push_back(this->poly_matrix.at(i) | other.poly_matrix.at(i));
         }
 
         return PolyMatrix(result);
@@ -175,7 +175,7 @@ namespace pqdevkit
 
         for (size_t i = 0; i < rows(); i++)
         {
-            result.push_back(poly_matrix_ptr->at(i));
+            result.push_back(this->poly_matrix.at(i));
         }
 
         for (size_t i = 0; i < other.rows(); i++)
@@ -205,7 +205,7 @@ namespace pqdevkit
 
                 for (size_t k = 0; k < cols(); k++)
                 {
-                    current = current + (poly_matrix_ptr->at(i).get_vector()[k].get_poly() *
+                    current = current + (this->poly_matrix.at(i).get_vector()[k].get_poly() *
                                          other.transposed().get_matrix()[k].get_vector()[j].get_poly());
                 } // TODO: test this
 

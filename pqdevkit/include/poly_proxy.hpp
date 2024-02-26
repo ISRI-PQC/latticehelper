@@ -17,7 +17,8 @@ namespace pqdevkit
     class PolyProxy
     {
     private:
-        std::unique_ptr<poly_type> poly_ptr;
+        poly_type underlying_poly;
+        bool ntt_from = false;
 
     public:
         unsigned short degree = PQDEVKIT_DEGREE;
@@ -25,11 +26,13 @@ namespace pqdevkit
 
         PolyProxy(coeff_type constant);
         PolyProxy(std::initializer_list<coeff_type> coefficients); // {1,2,3}
-        PolyProxy(const poly_type &poly);
+        PolyProxy(const poly_type &other, const bool ntt_from = true);
         PolyProxy(const PolyProxy &other);
         ~PolyProxy();
 
-        poly_type &get_poly() const;
+        bool is_ntt() const;
+
+        const poly_type &get_poly() const;
 
         coeff_type infinite_norm() const;
         std::vector<coeff_type> listize() const;

@@ -4,40 +4,40 @@
 namespace pqdevkit
 {
     // PolyVector
-    PolyVector::PolyVector(std::initializer_list<std::initializer_list<coeff_type>> poly_vector)
+    PolyVector::PolyVector(std::initializer_list<std::initializer_list<coeff_type>> other)
     {
         std::vector<PolyProxy> result;
 
-        for (auto poly : poly_vector)
+        for (auto poly : other)
         {
             result.push_back(PolyProxy(poly));
         }
 
-        poly_vector_ptr = std::unique_ptr<std::vector<PolyProxy>>(new std::vector<PolyProxy>(result));
+        this->poly_vector = result;
     }
 
-    PolyVector::PolyVector(const std::vector<PolyProxy> &poly_vector)
+    PolyVector::PolyVector(const std::vector<PolyProxy> &other)
     {
-        poly_vector_ptr = std::unique_ptr<std::vector<PolyProxy>>(new std::vector<PolyProxy>(poly_vector));
+        this->poly_vector = other;
     }
 
     PolyVector::PolyVector(const PolyVector &other)
     {
-        poly_vector_ptr = std::unique_ptr<std::vector<PolyProxy>>(new std::vector<PolyProxy>(*other.poly_vector_ptr));
+        this->poly_vector = other.poly_vector;
     }
 
     PolyVector::~PolyVector() {}
 
-    std::vector<PolyProxy> &PolyVector::get_vector() const
+    const std::vector<PolyProxy> &PolyVector::get_vector() const
     {
-        return *poly_vector_ptr;
+        return this->poly_vector;
     }
 
     coeff_type PolyVector::infinite_norm() const
     {
         coeff_type maxNorm = std::numeric_limits<coeff_type>::min();
 
-        for (const auto &polyProxy : *poly_vector_ptr)
+        for (const auto &polyProxy : this->poly_vector)
         {
             coeff_type currentNorm = polyProxy.infinite_norm();
             if (currentNorm > maxNorm)
@@ -51,14 +51,14 @@ namespace pqdevkit
 
     size_t PolyVector::length() const
     {
-        return (*poly_vector_ptr).size();
+        return this->poly_vector.size();
     }
 
     std::vector<coeff_type> PolyVector::listize() const
     {
         std::vector<coeff_type> result;
 
-        for (const auto &polyProxy : *poly_vector_ptr)
+        for (const auto &polyProxy : this->poly_vector)
         {
             std::vector<coeff_type> currentList = polyProxy.listize();
             result.insert(result.end(), currentList.begin(), currentList.end());
@@ -71,7 +71,7 @@ namespace pqdevkit
     {
         std::vector<PolyProxy> scaledPolyVector;
 
-        for (const auto &polyProxy : *poly_vector_ptr)
+        for (const auto &polyProxy : this->poly_vector)
         {
             scaledPolyVector.push_back(polyProxy * scalar);
         }
@@ -83,7 +83,7 @@ namespace pqdevkit
     {
         std::vector<PolyProxy> scaledPolyVector;
 
-        for (const auto &polyProxy : *poly_vector_ptr)
+        for (const auto &polyProxy : this->poly_vector)
         {
             scaledPolyVector.push_back(polyProxy * poly);
         }
@@ -93,17 +93,17 @@ namespace pqdevkit
 
     PolyVector PolyVector::operator+(const PolyVector &other) const
     {
-        if (poly_vector_ptr->size() != other.poly_vector_ptr->size())
+        if (this->poly_vector.size() != other.poly_vector.size())
         {
             throw std::runtime_error("PolyVector::operator+: PolyVectors must have the same length");
         }
 
         std::vector<PolyProxy> result;
 
-        for (size_t i = 0; i < poly_vector_ptr->size(); i++)
+        for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
             result.push_back(
-                poly_vector_ptr->at(i) + other.poly_vector_ptr->at(i));
+                this->poly_vector.at(i) + other.poly_vector.at(i));
         }
 
         return result;
@@ -111,16 +111,16 @@ namespace pqdevkit
 
     PolyVector PolyVector::operator-(const PolyVector &other) const
     {
-        if (poly_vector_ptr->size() != other.poly_vector_ptr->size())
+        if (this->poly_vector.size() != other.poly_vector.size())
         {
             throw std::runtime_error("PolyVector::operator-: PolyVectors must have the same length");
         }
 
         std::vector<PolyProxy> result;
 
-        for (size_t i = 0; i < poly_vector_ptr->size(); i++)
+        for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            result.push_back(poly_vector_ptr->at(i) - other.poly_vector_ptr->at(i));
+            result.push_back(this->poly_vector.at(i) - other.poly_vector.at(i));
         }
 
         return PolyVector(result);
@@ -128,7 +128,7 @@ namespace pqdevkit
 
     PolyVector PolyVector::operator|(const PolyVector &other) const
     {
-        if (poly_vector_ptr->size() != other.poly_vector_ptr->size())
+        if (this->poly_vector.size() != other.poly_vector.size())
         {
             throw std::runtime_error("PolyVector::operator|: PolyVectors must have the same length");
         }
@@ -136,12 +136,12 @@ namespace pqdevkit
         // concatenate this and other
         std::vector<PolyProxy> result;
 
-        for (const auto &polyProxy : *poly_vector_ptr)
+        for (const auto &polyProxy : this->poly_vector)
         {
             result.push_back(polyProxy);
         }
 
-        for (const auto &polyProxy : *other.poly_vector_ptr)
+        for (const auto &polyProxy : other.poly_vector)
         {
             result.push_back(polyProxy);
         }
@@ -152,16 +152,16 @@ namespace pqdevkit
     PolyProxy PolyVector::operator*(const PolyVector &other) const
     {
         // dot product
-        if (poly_vector_ptr->size() != other.poly_vector_ptr->size())
+        if (this->poly_vector.size() != other.poly_vector.size())
         {
             throw std::runtime_error("PolyVector::operator*: PolyVectors must have the same length");
         }
 
         poly_type result;
 
-        for (size_t i = 0; i < poly_vector_ptr->size(); i++)
+        for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
-            result = result + (poly_vector_ptr->at(i).get_poly() * other.poly_vector_ptr->at(i).get_poly());
+            result = result + (this->poly_vector.at(i).get_poly() * other.poly_vector.at(i).get_poly());
         }
 
         return result;
@@ -169,7 +169,7 @@ namespace pqdevkit
 
     PolyVector PolyVector::operator*(const PolyMatrix &other) const
     {
-        if (poly_vector_ptr->size() != other.cols())
+        if (this->poly_vector.size() != other.cols())
         {
             throw std::runtime_error("PolyVector::operator*: PolyVector and PolyMatrix must have the same length");
         }
@@ -180,9 +180,9 @@ namespace pqdevkit
         {
             poly_type current;
 
-            for (size_t j = 0; j < poly_vector_ptr->size(); j++)
+            for (size_t j = 0; j < this->poly_vector.size(); j++)
             {
-                current = current + (poly_vector_ptr->at(j).get_poly() *
+                current = current + (this->poly_vector.at(j).get_poly() *
                                      other.get_matrix()[i].get_vector()[j].get_poly());
             }
 

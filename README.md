@@ -13,6 +13,10 @@ For ease of use, we will also include a wrapper for [liboqs](https://github.com/
 
 Initial target languages are Python and Go.
 
+## TODO
+- [ ] Consider using CMakeLists.txt for SWIG
+- [ ] Consider using SWIG directives in C/C++ files directly
+
 ## Project structure
 
 ## Prerequisites
@@ -24,4 +28,5 @@ Initial target languages are Python and Go.
 export LIBOQS_ROOT="CHANGE_ME: <path-to-liboqs-repo>"
 export DYLD_FALLBACK_LIBRARY_PATH="$DYLD_FALLBACK_LIBRARY_PATH:$LIBOQS_ROOT/build/lib" # only for macOS
 export CGO_CPPFLAGS="-I$LIBOQS_ROOT/build/include"
-export CGO_LDFLAGS="-L$LIBOQS_ROOT/build/lib -loqs"```
+export CGO_LDFLAGS="-L$LIBOQS_ROOT/build/lib -loqs"
+```

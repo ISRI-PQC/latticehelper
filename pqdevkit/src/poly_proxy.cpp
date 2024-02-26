@@ -6,39 +6,46 @@ namespace pqdevkit
     /// @param constant
     PolyProxy::PolyProxy(coeff_type constant)
     {
-        poly_ptr = std::unique_ptr<poly_type>(new poly_type(constant));
-        poly_ptr->ntt_pow_phi();
+        this->underlying_poly = poly_type(constant);
+        this->underlying_poly.ntt_pow_phi();
+        this->ntt_from = true;
     }
 
     /// @brief DOES convert to NTT
     /// @param coefficients
     PolyProxy::PolyProxy(std::initializer_list<coeff_type> coefficients)
     {
-        poly_ptr = std::unique_ptr<poly_type>(new poly_type(coefficients));
-        poly_ptr->ntt_pow_phi();
+        this->underlying_poly = poly_type(coefficients);
+        this->underlying_poly.ntt_pow_phi();
+        this->ntt_from = true;
     }
 
     /// @brief DOES NOT convert to NTT
     /// @param poly
-    PolyProxy::PolyProxy(const poly_type &poly)
+    PolyProxy::PolyProxy(const poly_type &other, const bool ntt_from)
     {
-        poly_ptr = std::unique_ptr<poly_type>(new poly_type(poly));
+        this->underlying_poly = poly_type(other);
+        this->ntt_from = ntt_from;
     }
 
     /// @brief DOES NOT convert to NTT
-    /// @param other 
+    /// @param other
     PolyProxy::PolyProxy(const PolyProxy &other)
     {
-        poly_ptr = std::unique_ptr<poly_type>(new poly_type(*other.poly_ptr));
+        this->underlying_poly = poly_type(other.underlying_poly);
+        this->ntt_from = other.ntt_from;
     }
 
     PolyProxy::~PolyProxy() {}
 
-    /// @brief
-    /// @return
-    poly_type &PolyProxy::get_poly() const
+    bool PolyProxy::is_ntt() const
     {
-        return *poly_ptr;
+        return this->ntt_from;
+    }
+
+    const poly_type &PolyProxy::get_poly() const
+    {
+        return this->underlying_poly;
     }
 
     coeff_type PolyProxy::infinite_norm() const
@@ -55,17 +62,17 @@ namespace pqdevkit
 
     PolyProxy PolyProxy::operator+(const PolyProxy &other) const
     {
-        return poly_type(*poly_ptr + *other.poly_ptr);
+        return poly_type(this->underlying_poly + other.underlying_poly);
     }
 
     PolyProxy PolyProxy::operator-(const PolyProxy &other) const
     {
-        return poly_type(*poly_ptr - *other.poly_ptr);
+        return poly_type(this->underlying_poly - other.underlying_poly);
     }
 
     PolyProxy PolyProxy::operator*(const PolyProxy &other) const
     {
-        return poly_type(*poly_ptr * *other.poly_ptr);
+        return poly_type(this->underlying_poly * other.underlying_poly);
     }
 
     PolyProxy PolyProxy::operator*(const coeff_type &scalar) const

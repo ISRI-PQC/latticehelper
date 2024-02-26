@@ -1,7 +1,6 @@
 #ifndef PQDEVKIT_POLY_MATRIX_HPP
 #define PQDEVKIT_POLY_MATRIX_HPP
 
-#include <memory>
 #include "params.hpp"
 #include "poly_vector.hpp"
 
@@ -11,7 +10,7 @@ namespace pqdevkit
     class PolyMatrix
     {
     private:
-        std::unique_ptr<std::vector<PolyVector>> poly_matrix_ptr;
+        std::vector<PolyVector> poly_matrix;
 
     public:
         /*
@@ -26,12 +25,12 @@ namespace pqdevkit
             }
         }
         */
-        PolyMatrix(std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> poly_matrix);
-        PolyMatrix(const std::vector<PolyVector> &poly_matrix);
+        PolyMatrix(std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other);
+        PolyMatrix(const std::vector<PolyVector> &other);
         PolyMatrix(const PolyMatrix &other);
         ~PolyMatrix();
 
-        std::vector<PolyVector> get_matrix() const;
+        const std::vector<PolyVector> &get_matrix() const;
 
         size_t rows() const;
         size_t cols() const;
@@ -55,6 +54,8 @@ namespace pqdevkit
         static PolyMatrix identity_matrix(size_t size);
         static PolyMatrix zero_matrix(size_t rows, size_t cols);
     };
+
+    PolyMatrix operator*(const coeff_type &scalar, const PolyMatrix &poly_matrix);
 } // namespace pqdevkit
 
 #endif // PQDEVKIT_POLY_MATRIX_HPP

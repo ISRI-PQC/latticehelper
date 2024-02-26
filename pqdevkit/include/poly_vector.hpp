@@ -1,7 +1,6 @@
 #ifndef PQDEVKIT_POLY_VECTOR_HPP
 #define PQDEVKIT_POLY_VECTOR_HPP
 
-#include <memory>
 #include "params.hpp"
 #include "poly_proxy.hpp"
 
@@ -13,15 +12,15 @@ namespace pqdevkit
     class PolyVector
     {
     private:
-        std::unique_ptr<std::vector<PolyProxy>> poly_vector_ptr;
+        std::vector<PolyProxy> poly_vector;
 
     public:
-        PolyVector(std::initializer_list<std::initializer_list<coeff_type>> poly_vector); // {{1,2,3}, {4,5,6}}
-        PolyVector(const std::vector<PolyProxy> &poly_vector);
+        PolyVector(std::initializer_list<std::initializer_list<coeff_type>> other); // {{1,2,3}, {4,5,6}}
+        PolyVector(const std::vector<PolyProxy> &other);
         PolyVector(const PolyVector &other);
         ~PolyVector();
 
-        std::vector<PolyProxy>& get_vector() const;
+        const std::vector<PolyProxy> &get_vector() const;
 
         size_t length() const;
 
@@ -40,8 +39,7 @@ namespace pqdevkit
         static PolyVector random_poly_vector(size_t length);
     };
 
-    PolyVector operator*(const coeff_type &scalar,
-                         const PolyVector &poly_vector);
+    PolyVector operator*(const coeff_type &scalar, const PolyVector &poly_vector);
 } // namespace pqdevkit
 
 #endif // PQDEVKIT_POLY_VECTOR_HPP

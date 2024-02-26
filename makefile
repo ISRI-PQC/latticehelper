@@ -8,7 +8,8 @@ NFL_ROOT=NFLlib
 all: python go
 
 clean:
-	rm -rf swigbuild
+	rm -rf swigbuild pqdevkit/build/libpqdevkit.a
+	
 
 # $(LIBOQS_ROOT):
 # 	@if [ ! -d $(LIBOQS_ROOT) ]; then \
@@ -100,6 +101,11 @@ python: pqdevkit/build/libpqdevkit.a $(NFL_ROOT)/lib/libNFLlib.a # $(LIBOQS_ROOT
 		-lssl \
 		-lcrypto \
 		-o ./swigbuild/python/_pqdevkit.so
+
+	# temp
+	cp ./swigbuild/python/_pqdevkit.so pypqdevkit/_pqdevkit.so
+	cp ./swigbuild/python/pqdevkit.py pypqdevkit/pqdevkit.py
+
 
 go: pqdevkit/build/libpqdevkit.a $(NFL_ROOT)/lib/libNFLlib.a # $(LIBOQS_ROOT)/build/lib/liboqs.a
 	@echo "Building Go extension.."
