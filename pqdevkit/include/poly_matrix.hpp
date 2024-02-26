@@ -5,6 +5,7 @@
 #include "poly_vector.hpp"
 
 // TODO: consider using classes and having private members
+// TODO: maybe use std::list instead of std::vector (https://baptiste-wicht.com/posts/2012/12/cpp-benchmark-vector-list-deque.html)
 namespace pqdevkit
 {
     class PolyMatrix
