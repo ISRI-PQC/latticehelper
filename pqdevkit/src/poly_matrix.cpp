@@ -2,7 +2,7 @@
 
 namespace pqdevkit
 {
-    PolyMatrix::PolyMatrix(std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other)
+    PolyMatrix::PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other)
     {
         std::vector<PolyVector> result;
 
@@ -11,7 +11,7 @@ namespace pqdevkit
             result.push_back(PolyVector(row));
         }
 
-        this->poly_matrix = result;
+        this->poly_matrix = std::move(result);
     }
 
     PolyMatrix::PolyMatrix(const std::vector<PolyVector> &other)
@@ -26,7 +26,7 @@ namespace pqdevkit
 
     PolyMatrix::~PolyMatrix() {}
 
-    const std::vector<PolyVector>& PolyMatrix::get_matrix() const
+    const std::vector<PolyVector> &PolyMatrix::get_matrix() const
     {
         return this->poly_matrix;
     }
@@ -38,7 +38,7 @@ namespace pqdevkit
 
     size_t PolyMatrix::cols() const
     {
-        return this->poly_matrix.at(0).length();
+        return this->poly_matrix.front().length();
     }
 
     coeff_type PolyMatrix::infinite_norm() const

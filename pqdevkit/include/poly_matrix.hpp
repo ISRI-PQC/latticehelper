@@ -26,7 +26,7 @@ namespace pqdevkit
             }
         }
         */
-        PolyMatrix(std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other);
+        PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other);
         PolyMatrix(const std::vector<PolyVector> &other);
         PolyMatrix(const PolyMatrix &other);
         ~PolyMatrix();

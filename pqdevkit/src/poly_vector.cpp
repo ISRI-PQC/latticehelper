@@ -4,7 +4,7 @@
 namespace pqdevkit
 {
     // PolyVector
-    PolyVector::PolyVector(std::initializer_list<std::initializer_list<coeff_type>> other)
+    PolyVector::PolyVector(const std::initializer_list<std::initializer_list<coeff_type>> other)
     {
         std::vector<PolyProxy> result(other.size());
 
@@ -15,7 +15,7 @@ namespace pqdevkit
             i++;
         }
 
-        this->poly_vector = result;
+        this->poly_vector = std::move(result);
     }
 
     PolyVector::PolyVector(const std::vector<PolyProxy> &other)
@@ -58,7 +58,7 @@ namespace pqdevkit
 
     std::vector<coeff_type> PolyVector::listize() const
     {
-        size_t total_size = this->poly_vector.size() * this->poly_vector.at(0).degree;
+        size_t total_size = this->poly_vector.size() * this->poly_vector.front().degree;
         std::vector<coeff_type> result(total_size);
 
         size_t i = 0;

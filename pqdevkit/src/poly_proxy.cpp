@@ -4,7 +4,7 @@ namespace pqdevkit
 {
     /// @brief DOES convert to NTT
     /// @param constant
-    PolyProxy::PolyProxy(coeff_type constant)
+    PolyProxy::PolyProxy(const coeff_type constant)
     {
         this->underlying_poly = poly_type(constant);
         this->underlying_poly.ntt_pow_phi();
@@ -13,7 +13,7 @@ namespace pqdevkit
 
     /// @brief DOES convert to NTT
     /// @param coefficients
-    PolyProxy::PolyProxy(std::initializer_list<coeff_type> coefficients)
+    PolyProxy::PolyProxy(const std::initializer_list<coeff_type> coefficients)
     {
         this->underlying_poly = poly_type(coefficients);
         this->underlying_poly.ntt_pow_phi();

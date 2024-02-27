@@ -24,8 +24,8 @@ namespace pqdevkit
         unsigned short degree = PQDEVKIT_DEGREE;
         size_t coeff_modulus = PQDEVKIT_COEFF_MODULUS;
 
-        PolyProxy(coeff_type constant);
-        PolyProxy(std::initializer_list<coeff_type> coefficients); // {1,2,3}
+        PolyProxy(const coeff_type constant);
+        PolyProxy(const std::initializer_list<coeff_type> coefficients); // {1,2,3}
         PolyProxy(const poly_type &other, const bool ntt_from = true);
         PolyProxy(const PolyProxy &other);
         ~PolyProxy();

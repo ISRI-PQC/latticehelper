@@ -16,7 +16,7 @@ namespace pqdevkit
         std::vector<PolyProxy> poly_vector;
 
     public:
-        PolyVector(std::initializer_list<std::initializer_list<coeff_type>> other); // {{1,2,3}, {4,5,6}}
+        PolyVector(const std::initializer_list<std::initializer_list<coeff_type>> other); // {{1,2,3}, {4,5,6}}
         PolyVector(const std::vector<PolyProxy> &other);
         PolyVector(const PolyVector &other);
         ~PolyVector();
