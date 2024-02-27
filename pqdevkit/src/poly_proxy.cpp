@@ -60,6 +60,12 @@ namespace pqdevkit
             "Not implemented"); // TODO: how do I get coeffs from NFLlib?
     }
 
+    PolyProxy PolyProxy::operator-() const
+    {
+        throw std::runtime_error(
+            "Not implemented"); // TODO: how do I get coeffs from NFLlib?
+    }
+
     PolyProxy PolyProxy::operator+(const PolyProxy &other) const
     {
         return poly_type(this->underlying_poly + other.underlying_poly);
@@ -78,6 +84,11 @@ namespace pqdevkit
     PolyProxy PolyProxy::operator*(const coeff_type &scalar) const
     {
         throw std::runtime_error("Not implemented"); // TODO: how do I get, modify and save coeffs from NFLlib?
+    }
+
+    PolyProxy operator*(const coeff_type &scalar, const PolyProxy &poly_proxy)
+    {
+        return poly_proxy * scalar;
     }
 
     PolyProxy PolyProxy::random_poly()

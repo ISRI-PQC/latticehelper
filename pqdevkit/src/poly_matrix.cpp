@@ -2,7 +2,19 @@
 
 namespace pqdevkit
 {
-    PolyMatrix::PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other)
+    PolyMatrix::PolyMatrix(const std::initializer_list<std::initializer_list<PolyProxy>> &other)
+    {
+        std::vector<PolyVector> result;
+
+        for (auto row : other)
+        {
+            result.push_back(PolyVector(row));
+        }
+
+        this->poly_matrix = std::move(result);
+    }
+
+    PolyMatrix::PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> &other)
     {
         std::vector<PolyVector> result;
 

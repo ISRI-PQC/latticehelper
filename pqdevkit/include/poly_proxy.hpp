@@ -37,6 +37,8 @@ namespace pqdevkit
         coeff_type infinite_norm() const;
         std::vector<coeff_type> listize() const;
 
+        PolyProxy operator-() const;
+
         PolyProxy operator+(const PolyProxy &other) const;
         PolyProxy operator-(const PolyProxy &other) const;
         PolyProxy operator*(const PolyProxy &other) const;
@@ -44,6 +46,8 @@ namespace pqdevkit
 
         static PolyProxy random_poly();
     };
+
+    PolyProxy operator*(const coeff_type &scalar, const PolyProxy &poly_proxy);
 
 } // namespace pqdevkit
 

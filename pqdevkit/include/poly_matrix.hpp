@@ -14,19 +14,8 @@ namespace pqdevkit
         std::vector<PolyVector> poly_matrix;
 
     public:
-        /*
-        {
-            {
-                {1, 2, 3},
-                {4, 5, 6}
-            },
-            {
-                {7, 8, 9},
-                {10, 11, 12}
-            }
-        }
-        */
-        PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> other);
+        PolyMatrix(const std::initializer_list<std::initializer_list<PolyProxy>> &other);
+        PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> &other);
         PolyMatrix(const std::vector<PolyVector> &other);
         PolyMatrix(const PolyMatrix &other);
         ~PolyMatrix();
