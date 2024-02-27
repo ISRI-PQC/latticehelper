@@ -1,7 +1,7 @@
 #ifndef PQDEVKIT_POLY_MATRIX_HPP
 #define PQDEVKIT_POLY_MATRIX_HPP
 
-#include "params.hpp"
+#include "pqdevkit_params.hpp"
 #include "poly_vector.hpp"
 
 // TODO: consider using classes and having private members

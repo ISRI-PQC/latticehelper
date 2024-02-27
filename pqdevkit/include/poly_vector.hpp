@@ -1,7 +1,7 @@
 #ifndef PQDEVKIT_POLY_VECTOR_HPP
 #define PQDEVKIT_POLY_VECTOR_HPP
 
-#include "params.hpp"
+#include "pqdevkit_params.hpp"
 #include "poly_proxy.hpp"
 
 // TODO: consider using classes and having private members

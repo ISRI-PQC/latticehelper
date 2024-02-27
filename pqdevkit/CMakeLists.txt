@@ -21,12 +21,3 @@ target_compile_options(pqdevkit PRIVATE -std=c++11 -Wall -Wextra -Werror -Wno-un
 
 # Include additional directories
 target_include_directories(pqdevkit PRIVATE ${NFL_INCLUDE})
-
-add_executable(pqdevkit_main src/main.cpp ${SOURCE_FILES})
-target_compile_options(pqdevkit_main PRIVATE -std=c++11 -Wall -Wextra -Werror -Wno-unused-parameter)
-
-# Link other static libraries
-target_link_libraries(pqdevkit_main PRIVATE ${NFL_LIB})
-
-# Include additional directories
-target_include_directories(pqdevkit_main PRIVATE ${NFL_INCLUDE})

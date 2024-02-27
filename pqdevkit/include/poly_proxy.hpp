@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <limits>
-#include "params.hpp"
+#include "pqdevkit_params.hpp"
 
 // TODO: consider not using PolyProxy at all and specify helper functions -
 // what about scaling with scalar?
