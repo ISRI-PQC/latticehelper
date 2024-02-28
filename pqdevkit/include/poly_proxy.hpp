@@ -3,17 +3,13 @@
 
 #include <memory>
 #include <limits>
-#include "pqdevkit_params.hpp"
+#include "pqdevkit_math_lib.hpp"
 
 // TODO: consider not using PolyProxy at all and specify helper functions -
 // what about scaling with scalar?
 namespace pqdevkit
 {
-    // NFL specific
-    using poly_type = PQDEVKIT_POLY_TYPE;
-    using coeff_type = PQDEVKIT_COEFF_TYPE;
-
-    // TODO: make this a template for easy switching of the math library
+    template <unsigned short _degree, size_t _coeff_modulus>
     class PolyProxy
     {
     private:
@@ -21,11 +17,15 @@ namespace pqdevkit
         bool ntt_from = false;
 
     public:
-        unsigned short degree = PQDEVKIT_DEGREE;
-        size_t coeff_modulus = PQDEVKIT_COEFF_MODULUS;
+        // NFL specific
+        typedef PQDEVKIT_POLY_TYPE poly_type;
+        typedef PQDEVKIT_COEFF_TYPE coeff_type;
+
+        unsigned short degree = _degree;
+        size_t coeff_modulus = _coeff_modulus;
 
         PolyProxy(const coeff_type constant);
-        PolyProxy(const std::initializer_list<coeff_type> coefficients); // {1,2,3}
+        PolyProxy(const std::initializer_list<coeff_type> coefficients);
         PolyProxy(const poly_type &other, const bool ntt_from = true);
         PolyProxy(const PolyProxy &other);
         ~PolyProxy();
@@ -47,7 +47,8 @@ namespace pqdevkit
         static PolyProxy random_poly();
     };
 
-    PolyProxy operator*(const coeff_type &scalar, const PolyProxy &poly_proxy);
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyProxy<_degree, _coeff_modulus> operator*(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar, const PolyProxy<_degree, _coeff_modulus> &poly_proxy);
 
 } // namespace pqdevkit
 

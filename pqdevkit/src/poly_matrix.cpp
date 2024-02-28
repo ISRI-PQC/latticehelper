@@ -2,7 +2,9 @@
 
 namespace pqdevkit
 {
-    PolyMatrix::PolyMatrix(const std::initializer_list<std::initializer_list<PolyProxy>> &other)
+
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus>::PolyMatrix(const std::initializer_list<std::initializer_list<PolyProxy<_degree, _coeff_modulus>>> &other)
     {
         std::vector<PolyVector> result;
 
@@ -14,7 +16,8 @@ namespace pqdevkit
         this->poly_matrix = std::move(result);
     }
 
-    PolyMatrix::PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<coeff_type>>> &other)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus>::PolyMatrix(const std::initializer_list<std::initializer_list<std::initializer_list<typename PolyProxy<_degree, _coeff_modulus>::coeff_type>>> &other)
     {
         std::vector<PolyVector> result;
 
@@ -26,34 +29,41 @@ namespace pqdevkit
         this->poly_matrix = std::move(result);
     }
 
-    PolyMatrix::PolyMatrix(const std::vector<PolyVector> &other)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus>::PolyMatrix(const std::vector<PolyVector<_degree, _coeff_modulus>> &other)
     {
         this->poly_matrix = other;
     }
 
-    PolyMatrix::PolyMatrix(const PolyMatrix &other)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus>::PolyMatrix(const PolyMatrix &other)
     {
         this->poly_matrix = other.poly_matrix;
     }
 
-    PolyMatrix::~PolyMatrix() {}
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus>::~PolyMatrix() {}
 
-    const std::vector<PolyVector> &PolyMatrix::get_matrix() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    const std::vector<PolyVector<_degree, _coeff_modulus>> &PolyMatrix<_degree, _coeff_modulus>::get_matrix() const
     {
         return this->poly_matrix;
     }
 
-    size_t PolyMatrix::rows() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    size_t PolyMatrix<_degree, _coeff_modulus>::rows() const
     {
         return this->poly_matrix.size();
     }
 
-    size_t PolyMatrix::cols() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    size_t PolyMatrix<_degree, _coeff_modulus>::cols() const
     {
         return this->poly_matrix.front().length();
     }
 
-    coeff_type PolyMatrix::infinite_norm() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    typename PolyProxy<_degree, _coeff_modulus>::coeff_type PolyMatrix<_degree, _coeff_modulus>::infinite_norm() const
     {
         coeff_type maxNorm = std::numeric_limits<coeff_type>::min();
 
@@ -69,7 +79,8 @@ namespace pqdevkit
         return maxNorm;
     }
 
-    std::vector<coeff_type> PolyMatrix::listize() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    std::vector<typename PolyProxy<_degree, _coeff_modulus>::coeff_type> PolyMatrix<_degree, _coeff_modulus>::listize() const
     {
         std::vector<coeff_type> result;
 
@@ -82,7 +93,8 @@ namespace pqdevkit
         return result;
     }
 
-    PolyMatrix PolyMatrix::transposed() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::transposed() const
     {
         std::vector<PolyVector> result;
 
@@ -101,7 +113,8 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyMatrix PolyMatrix::scale(const coeff_type &scalar) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::scale(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar) const
     {
         std::vector<PolyVector> scaledPolyMatrix;
 
@@ -113,7 +126,8 @@ namespace pqdevkit
         return PolyMatrix(scaledPolyMatrix);
     }
 
-    PolyMatrix PolyMatrix::scale(const poly_type &poly) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::scale(const typename PolyProxy<_degree, _coeff_modulus>::poly_type &poly) const
     {
         std::vector<PolyVector> scaledPolyMatrix;
 
@@ -125,7 +139,8 @@ namespace pqdevkit
         return PolyMatrix(scaledPolyMatrix);
     }
 
-    PolyMatrix PolyMatrix::operator+(const PolyMatrix &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator+(const PolyMatrix &other) const
     {
         if (rows() != other.rows() || cols() != other.cols())
         {
@@ -142,7 +157,8 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyMatrix PolyMatrix::operator-(const PolyMatrix &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator-(const PolyMatrix &other) const
     {
         if (rows() != other.rows() || cols() != other.cols())
         {
@@ -159,7 +175,8 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyMatrix PolyMatrix::operator|(const PolyMatrix &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator|(const PolyMatrix &other) const
     {
         if (rows() != other.rows())
         {
@@ -176,7 +193,8 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyMatrix PolyMatrix::operator/(const PolyMatrix &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator/(const PolyMatrix &other) const
     {
         if (cols() != other.cols())
         {
@@ -198,7 +216,8 @@ namespace pqdevkit
         return result;
     }
 
-    PolyMatrix PolyMatrix::operator*(const PolyMatrix &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator*(const PolyMatrix &other) const
     {
         if (cols() != other.rows())
         {
@@ -230,22 +249,26 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyVector PolyMatrix::operator*(const PolyVector &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator*(const PolyVector<_degree, _coeff_modulus> &other) const
     {
         return other * *this;
     }
 
-    PolyMatrix PolyMatrix::operator*(const coeff_type &scalar) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::operator*(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar) const
     {
         return scale(scalar);
     }
 
-    PolyMatrix operator*(const coeff_type &scalar, const PolyMatrix &poly_matrix)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> operator*(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar, const PolyMatrix<_degree, _coeff_modulus> &poly_matrix)
     {
         return poly_matrix.scale(scalar);
     }
 
-    PolyMatrix PolyMatrix::random_poly_matrix(size_t rows, size_t cols)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::random_poly_matrix(size_t rows, size_t cols)
     {
         std::vector<PolyVector> result;
 
@@ -257,7 +280,8 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyMatrix PolyMatrix::identity_matrix(size_t size)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::identity_matrix(size_t size)
     {
         std::vector<PolyVector> result;
 
@@ -283,7 +307,8 @@ namespace pqdevkit
         return PolyMatrix(result);
     }
 
-    PolyMatrix PolyMatrix::zero_matrix(size_t rows, size_t cols)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyMatrix<_degree, _coeff_modulus> PolyMatrix<_degree, _coeff_modulus>::zero_matrix(size_t rows, size_t cols)
     {
         std::vector<PolyVector> result;
 

@@ -3,8 +3,8 @@
 
 namespace pqdevkit
 {
-    // PolyVector
-    PolyVector::PolyVector(const std::initializer_list<std::initializer_list<coeff_type>> other)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus>::PolyVector(const std::initializer_list<std::initializer_list<typename PolyProxy<_degree, _coeff_modulus>::coeff_type>> other)
     {
         std::vector<PolyProxy> result;
 
@@ -16,24 +16,29 @@ namespace pqdevkit
         this->poly_vector = result;
     }
 
-    PolyVector::PolyVector(const std::vector<PolyProxy> &other)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus>::PolyVector(const std::vector<PolyProxy<_degree, _coeff_modulus>> &other)
     {
         this->poly_vector = other;
     }
 
-    PolyVector::PolyVector(const PolyVector &other)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus>::PolyVector(const PolyVector &other)
     {
         this->poly_vector = other.poly_vector;
     }
 
-    PolyVector::~PolyVector() {}
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus>::~PolyVector() {}
 
-    const std::vector<PolyProxy> &PolyVector::get_vector() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    const std::vector<PolyProxy<_degree, _coeff_modulus>> &PolyVector<_degree, _coeff_modulus>::get_vector() const
     {
         return this->poly_vector;
     }
 
-    coeff_type PolyVector::infinite_norm() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    typename PolyProxy<_degree, _coeff_modulus>::coeff_type PolyVector<_degree, _coeff_modulus>::infinite_norm() const
     {
         coeff_type maxNorm = std::numeric_limits<coeff_type>::min();
 
@@ -49,12 +54,14 @@ namespace pqdevkit
         return maxNorm;
     }
 
-    size_t PolyVector::length() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    size_t PolyVector<_degree, _coeff_modulus>::length() const
     {
         return this->poly_vector.size();
     }
 
-    std::vector<coeff_type> PolyVector::listize() const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    std::vector<typename PolyProxy<_degree, _coeff_modulus>::coeff_type> PolyVector<_degree, _coeff_modulus>::listize() const
     {
         std::vector<coeff_type> result;
 
@@ -67,7 +74,8 @@ namespace pqdevkit
         return result;
     }
 
-    PolyVector PolyVector::scale(const coeff_type &scalar) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::scale(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar) const
     {
         std::vector<PolyProxy> scaledPolyVector;
 
@@ -79,9 +87,10 @@ namespace pqdevkit
         return scaledPolyVector;
     }
 
-    PolyVector PolyVector::scale(const poly_type &poly) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::scale(const typename PolyProxy<_degree, _coeff_modulus>::poly_type &poly) const
     {
-       std::vector<PolyProxy> scaledPolyVector;
+        std::vector<PolyProxy> scaledPolyVector;
 
         for (const auto &polyProxy : this->poly_vector)
         {
@@ -91,7 +100,8 @@ namespace pqdevkit
         return scaledPolyVector;
     }
 
-    PolyVector PolyVector::operator+(const PolyVector &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::operator+(const PolyVector &other) const
     {
         if (this->poly_vector.size() != other.poly_vector.size())
         {
@@ -109,14 +119,15 @@ namespace pqdevkit
         return result;
     }
 
-    PolyVector PolyVector::operator-(const PolyVector &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::operator-(const PolyVector &other) const
     {
         if (this->poly_vector.size() != other.poly_vector.size())
         {
             throw std::runtime_error("PolyVector::operator-: PolyVectors must have the same length");
         }
 
-         std::vector<PolyProxy> result;
+        std::vector<PolyProxy> result;
 
         for (size_t i = 0; i < this->poly_vector.size(); i++)
         {
@@ -126,7 +137,8 @@ namespace pqdevkit
         return PolyVector(result);
     }
 
-    PolyVector PolyVector::operator|(const PolyVector &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::operator|(const PolyVector &other) const
     {
         if (this->poly_vector.size() != other.poly_vector.size())
         {
@@ -149,7 +161,8 @@ namespace pqdevkit
         return PolyVector(result);
     }
 
-    PolyProxy PolyVector::operator*(const PolyVector &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyProxy<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::operator*(const PolyVector &other) const
     {
         // dot product
         if (this->poly_vector.size() != other.poly_vector.size())
@@ -167,7 +180,8 @@ namespace pqdevkit
         return result;
     }
 
-    PolyVector PolyVector::operator*(const PolyMatrix &other) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::operator*(const PolyMatrix<_degree, _coeff_modulus> &other) const
     {
         if (this->poly_vector.size() != other.cols())
         {
@@ -192,19 +206,22 @@ namespace pqdevkit
         return PolyVector(result);
     }
 
-    PolyVector PolyVector::operator*(const coeff_type &scalar) const
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::operator*(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar) const
     {
         return scale(scalar);
     }
 
-    PolyVector operator*(const coeff_type &scalar, const PolyVector &poly_vector)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> operator*(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar, const PolyVector<_degree, _coeff_modulus> &poly_vector)
     {
         return poly_vector.scale(scalar);
     }
 
-    PolyVector PolyVector::random_poly_vector(size_t length)
+    template <unsigned short _degree, size_t _coeff_modulus>
+    PolyVector<_degree, _coeff_modulus> PolyVector<_degree, _coeff_modulus>::random_poly_vector(size_t length)
     {
-         std::vector<PolyProxy> result;
+        std::vector<PolyProxy> result;
 
         for (size_t i = 0; i < length; i++)
         {
