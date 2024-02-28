@@ -14,7 +14,7 @@ include_directories(include)
 
 add_library(pqdevkit STATIC ${SOURCE_FILES})
 
-target_compile_options(pqdevkit PRIVATE -std=c++11 -Wall -Wextra -Werror -Wno-unused-parameter)
+target_compile_options(pqdevkit PRIVATE -g -O0 -DDEBUG -ggdb -std=c++11 -Wall -Wextra -Werror -Wno-unused-parameter)
 
 # Link other static libraries
 # target_link_libraries(pqdevkit PRIVATE ${NFL_LIB})

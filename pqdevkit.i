@@ -1,4 +1,5 @@
 %module(directors = "1") pqdevkit
+#pragma SWIG nowarn=476
 
 %include <std_unique_ptr.i>
 %include "std_vector.i"

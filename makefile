@@ -80,6 +80,7 @@ python: pqdevkit/build/libpqdevkit.a $(NFL_ROOT)/lib/libNFLlib.a # $(LIBOQS_ROOT
 
 	@echo "Compiling C++ wrapper.."
 	g++ \
+		-g -O0 -DDEBUG -Wall -ggdb \
 		-std=c++11 \
 		-O2 \
 		-fPIC \
@@ -91,6 +92,7 @@ python: pqdevkit/build/libpqdevkit.a $(NFL_ROOT)/lib/libNFLlib.a # $(LIBOQS_ROOT
 
 	@echo "Building shared library.."
 	g++ \
+		-g -O0 -DDEBUG -Wall -ggdb \
 		-std=c++11 \
 		-shared \
 		./swigbuild/python/pqdevkit_wrap.o \
