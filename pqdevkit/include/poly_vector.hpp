@@ -7,54 +7,40 @@
 // (https://baptiste-wicht.com/posts/2012/12/cpp-benchmark-vector-list-deque.html)
 namespace pqdevkit
 {
-  template <unsigned short _degree, size_t _coeff_modulus> class PolyMatrix;
+  class PolyMatrix;
 
-  template <unsigned short _degree, size_t _coeff_modulus> class PolyVector
+  class PolyVector
   {
   private:
     std::vector<PolyProxy> poly_vector;
 
   public:
-    PolyVector(const std::initializer_list<std::initializer_list<
-                 typename PolyProxy<_degree, _coeff_modulus>::coeff_type>>
-                 other);
-    PolyVector(const std::vector<PolyProxy<_degree, _coeff_modulus>> &other);
+    PolyVector(const std::initializer_list<std::initializer_list<long>> other);
+    PolyVector(const std::vector<PolyProxy> &other);
     PolyVector(const PolyVector &other);
     ~PolyVector();
 
-    const std::vector<PolyProxy<_degree, _coeff_modulus>> &get_vector() const;
+    const std::vector<PolyProxy> &get_vector() const;
 
     size_t length() const;
 
-    typename PolyProxy<_degree, _coeff_modulus>::coeff_type
-    infinite_norm() const;
-    std::vector<typename PolyProxy<_degree, _coeff_modulus>::coeff_type>
-    listize() const;
+    long infinite_norm() const;
+    std::vector<PQDEVKIT_COEFF_TYPE> listize() const;
 
-    PolyVector
-    scale(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type
-            &scalar) const;
-    PolyVector
-    scale(const typename PolyProxy<_degree, _coeff_modulus>::poly_type &poly)
-      const;
+    PolyVector scale(const PQDEVKIT_COEFF_TYPE &scalar) const;
+    PolyVector scale(const PQDEVKIT_POLY_TYPE &poly) const;
     PolyVector operator+(const PolyVector &other) const;
     PolyVector operator-(const PolyVector &other) const;
     PolyVector operator|(const PolyVector &other) const;
-    PolyProxy<_degree, _coeff_modulus>
-    operator*(const PolyVector &other) const;
-    PolyVector
-    operator*(const PolyMatrix<_degree, _coeff_modulus> &other) const;
-    PolyVector
-    operator*(const typename PolyProxy<_degree, _coeff_modulus>::coeff_type
-                &scalar) const;
+    PolyProxy operator*(const PolyVector &other) const;
+    PolyVector operator*(const PolyMatrix &other) const;
+    PolyVector operator*(const PQDEVKIT_COEFF_TYPE &scalar) const;
 
     static PolyVector random_poly_vector(size_t length);
   };
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyVector<_degree, _coeff_modulus> operator*(
-    const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar,
-    const PolyVector<_degree, _coeff_modulus> &poly_vector);
+  PolyVector
+  operator*(const PQDEVKIT_COEFF_TYPE &scalar, const PolyVector &poly_vector);
 } // namespace pqdevkit
 
 #endif // PQDEVKIT_POLY_VECTOR_HPP

@@ -3,8 +3,8 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/ntl/include",
-                "${workspaceFolder}/pqdevkit/include",
+                "${workspaceFolder}/../ntl/include",
+                "${workspaceFolder}/include",
                 "/opt/homebrew/include"
             ],
             "defines": [],

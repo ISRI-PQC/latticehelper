@@ -92,8 +92,11 @@
         "fstream": "cpp",
         "semaphore": "cpp",
         "thread": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "__availability": "cpp",
+        "*.inc": "cpp"
     },
     "cmake.configureOnOpen": false,
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "cmake.sourceDirectory": "/Users/petr/Developer/Repos/pqdevkit/pqdevkit"
 }

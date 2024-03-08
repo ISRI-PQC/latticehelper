@@ -2,137 +2,86 @@
 
 namespace pqdevkit
 {
-  /// @brief DOES convert to NTT
-  /// @param constant
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::PolyProxy(
-    const typename PolyProxy<_degree, _coeff_modulus>::coeff_type constant)
+  PolyProxy::PolyProxy(const PQDEVKIT_COEFF_TYPE constant)
   {
-    this->underlying_poly = poly_type<_degree, _coeff_modulus>(constant);
-    this->underlying_poly.ntt_pow_phi();
-    this->ntt_from = true;
+    this->underlying_poly = PQDEVKIT_POLY_TYPE(constant);
   }
 
-  /// @brief DOES convert to NTT
-  /// @param coefficients
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::PolyProxy(
-    const std::initializer_list<
-      typename PolyProxy<_degree, _coeff_modulus>::coeff_type>
-      coefficients)
+  PolyProxy::PolyProxy(const std::initializer_list<long> coefficients)
   {
-    this->underlying_poly = poly_type<_degree, _coeff_modulus>(coefficients);
-    this->underlying_poly.ntt_pow_phi();
-    this->ntt_from = true;
-  }
+    if(coefficients.size() > PQDEVKIT_DEGREE)
+      {
+        throw std::runtime_error("Degree of polynomial exceeds the limit");
+      }
 
-  /// @brief DOES NOT convert to NTT
-  /// @param poly
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::PolyProxy(const poly_type &other,
-                                                const bool ntt_from)
-  {
-    this->underlying_poly = poly_type<_degree, _coeff_modulus>(other);
-    this->ntt_from = ntt_from;
-  }
-
-  /// @brief DOES NOT convert to NTT
-  /// @param other
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::PolyProxy(const PolyProxy &other)
-  {
     this->underlying_poly
-      = poly_type<_degree, _coeff_modulus>(other.underlying_poly);
-    this->ntt_from = other.ntt_from;
+      = PQDEVKIT_POLY_TYPE(NTL::INIT_SIZE, coefficients.size());
+
+    for(auto it = coefficients.begin(); it != coefficients.end(); it++)
+      {
+        NTL::SetCoeff(this->underlying_poly, it - coefficients.begin(), *it);
+      }
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::~PolyProxy()
-  {}
-
-  template <unsigned short _degree, size_t _coeff_modulus>
-  bool PolyProxy<_degree, _coeff_modulus>::is_ntt() const
+  PolyProxy::PolyProxy(const PQDEVKIT_POLY_TYPE &other)
   {
-    return this->ntt_from;
+    this->underlying_poly = other;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  const PolyProxy<_degree, _coeff_modulus>::poly_type &
-  PolyProxy<_degree, _coeff_modulus>::get_poly() const
+  PolyProxy::PolyProxy(const PolyProxy &other)
+  {
+    this->underlying_poly = other.underlying_poly;
+  }
+
+  PolyProxy::~PolyProxy() {}
+
+  const PQDEVKIT_POLY_TYPE &PolyProxy::get_poly() const
   {
     return this->underlying_poly;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  typename PolyProxy<_degree, _coeff_modulus>::coeff_type
-  PolyProxy<_degree, _coeff_modulus>::infinite_norm() const
+  long PolyProxy::infinite_norm() const
   {
-    throw std::runtime_error(
-      "Not implemented"); // TODO: how do I get coeffs from NFLlib?
+    throw std::runtime_error("Not implemented");
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  std::vector<typename PolyProxy<_degree, _coeff_modulus>::coeff_type>
-  PolyProxy<_degree, _coeff_modulus>::listize() const
+  std::vector<PQDEVKIT_COEFF_TYPE> PolyProxy::listize() const
   {
-    throw std::runtime_error(
-      "Not implemented"); // TODO: how do I get coeffs from NFLlib?
+    std::vector<PQDEVKIT_COEFF_TYPE> coefficients;
+    for(int i = 0; i <= this->underlying_poly.rep.length(); i++)
+      {
+        coefficients.emplace_back(NTL::coeff(this->underlying_poly, i));
+      }
+    return coefficients;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::operator-() const
+  PolyProxy PolyProxy::operator-() const { return -this->underlying_poly; }
+
+  PolyProxy PolyProxy::operator+(const PolyProxy &other) const
   {
-    throw std::runtime_error(
-      "Not implemented"); // TODO: how do I get coeffs from NFLlib?
+    return this->underlying_poly + other.underlying_poly;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::operator+(const PolyProxy &other) const
+  PolyProxy PolyProxy::operator-(const PolyProxy &other) const
   {
-    return poly_type<_degree, _coeff_modulus>(this->underlying_poly
-                                              + other.underlying_poly);
+    return this->underlying_poly - other.underlying_poly;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::operator-(const PolyProxy &other) const
+  PolyProxy PolyProxy::operator*(const PolyProxy &other) const
   {
-    return poly_type<_degree, _coeff_modulus>(this->underlying_poly
-                                              - other.underlying_poly);
+    return NTL::MulMod(this->underlying_poly, other.underlying_poly,
+                       PQDEVKIT_MODULUS);
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::operator*(const PolyProxy &other) const
+  PolyProxy PolyProxy::operator*(const long &scalar) const
   {
-    return poly_type<_degree, _coeff_modulus>(this->underlying_poly
-                                              * other.underlying_poly);
+    return this->underlying_poly * scalar;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::operator*(
-    const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar) const
-  {
-    throw std::runtime_error(
-      "Not implemented"); // TODO: how do I get, modify and save coeffs from
-                          // NFLlib?
-  }
-
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus> operator*(
-    const typename PolyProxy<_degree, _coeff_modulus>::coeff_type &scalar,
-    const PolyProxy<_degree, _coeff_modulus> &poly_proxy)
+  PolyProxy operator*(const long &scalar, const PolyProxy &poly_proxy)
   {
     return poly_proxy * scalar;
   }
 
-  template <unsigned short _degree, size_t _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>
-  PolyProxy<_degree, _coeff_modulus>::random_poly()
-  {
-    return poly_type<_degree, _coeff_modulus>(nfl::uniform());
-  }
+  PolyProxy PolyProxy::random_poly() { return NTL::random_ZZ_pE(); }
 } // namespace pqdevkit
