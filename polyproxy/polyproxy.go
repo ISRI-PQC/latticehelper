@@ -5,10 +5,13 @@ import (
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
 
-type PolyProxy ring.Poly
+type PolyProxy struct {
+	poly ring.Poly
+	isNtt bool
+}
 
 func NewRandomPoly() PolyProxy {
-	return PolyProxy(pqdevkit.MainUniformSampler.ReadNew())
+	return PolyProxy{pqdevkit.MainUniformSampler.ReadNew(), false}
 }
 
 func (poly PolyProxy) InfiniteNorm() uint64 {
@@ -29,5 +32,5 @@ func (poly PolyProxy) InfiniteNorm() uint64 {
 }
 
 func (poly PolyProxy) Listize() []uint64 {
-	return poly.Coeffs[0]
+	return poly.poly.Coeffs[0]
 }

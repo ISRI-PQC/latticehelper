@@ -41,8 +41,6 @@ func (vec PolyVector) InfiniteNorm() uint64 {
 func (vec PolyVector) Scale(poly polyproxy.PolyProxy) PolyVector {
 	newVec := make([]polyproxy.PolyProxy, len(vec))
 	for i, v := range vec {
-		newVec[i] = polyproxy.PolyProxy(mainRing.NewPoly())
-		pqdevkit.MainRing.MulCoeffsMontgomery(ring.Poly(v), ring.Poly(poly), ring.Poly(newVec[i]))
 	}
 	return newVec
 }

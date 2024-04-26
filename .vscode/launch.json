@@ -5,24 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
-            "type": "cppdbg",
+            "name": "Launch Package",
+            "type": "go",
             "request": "launch",
-            "program": "${workspaceFolder}/pqdevkit/build/main",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${fileDirname}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "lldb"
+            "mode": "auto",
+            "program": "${fileDirname}",
         },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Launch",
-            "program": "${workspaceFolder}/pqdevkit/build/main",
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        }
     ]
 }
