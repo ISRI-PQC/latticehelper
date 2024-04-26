@@ -1,4 +1,5 @@
-package main
+package pqdevkit
+// package main
 
 import (
 	"github.com/tuneinsight/lattigo/v5/ring"
