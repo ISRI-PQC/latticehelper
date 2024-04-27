@@ -1,4 +1,4 @@
-package polyproxy
+package pqdevkit
 
 /*
 	Returns x mod q, but centered around 0
