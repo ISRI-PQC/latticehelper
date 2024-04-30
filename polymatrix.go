@@ -1,8 +1,45 @@
-package pqdevkit
+package devkit
+
+import "strings"
 
 type PolyMatrix struct {
 	PolyVectors []PolyVector
 	IsNTT       bool
+}
+
+func NewRandomPolyMatrix(rows, cols int) PolyMatrix {
+	polyVectors := make([]PolyVector, rows)
+	for i := 0; i < rows; i++ {
+		polyVectors[i] = NewRandomPolyVector(cols)
+	}
+	return PolyMatrix{polyVectors, false}
+}
+
+func NewIdentityMatrix(size int) PolyMatrix {
+	newMatrix := NewZeroMatrix(size, size)
+	for i := 0; i < size; i++ {
+		newMatrix.PolyVectors[i].PolyProxies[i].Poly.Coeffs[0][0] = uint64(1)
+	}
+	return newMatrix
+}
+
+func NewZeroMatrix(rows, cols int) PolyMatrix {
+	polyVectors := make([]PolyVector, rows)
+	for i := 0; i < rows; i++ {
+		polyVectors[i] = NewZeroPolyVector(cols)
+	}
+	return PolyMatrix{polyVectors, false}
+}
+
+func (mat PolyMatrix) String() string {
+	var sb strings.Builder
+
+	sb.WriteString("PolyMatrix{\n")
+	for _, polyVector := range mat.PolyVectors {
+		sb.WriteString("\t" + polyVector.String() + "\n")
+	}
+	sb.WriteString("}")
+	return sb.String()
 }
 
 func (mat PolyMatrix) Rows() int {
@@ -186,10 +223,13 @@ func (mat PolyMatrix) MatMul(input_mat PolyMatrix) PolyMatrix {
 			currentPoly := MainRing.NewPoly()
 
 			for k := 0; k < cols; k++ {
-				MainRing.MulCoeffsBarrettThenAdd(mat.PolyVectors[i].PolyProxies[k].Poly, input_mat.Transposed().PolyVectors[k].PolyProxies[j].Poly, currentPoly)
+				MainRing.MulCoeffsBarrettThenAdd(
+					*mat.PolyVectors[i].PolyProxies[k].Poly,
+					*input_mat.Transposed().PolyVectors[k].PolyProxies[j].Poly,
+					currentPoly)
 			}
 
-			currentVec[j] = PolyProxy{currentPoly, true}
+			currentVec[j] = PolyProxy{&currentPoly, true}
 		}
 		newMat[i] = PolyVector{currentVec, true}
 	}
@@ -200,32 +240,4 @@ func (mat PolyMatrix) MatMul(input_mat PolyMatrix) PolyMatrix {
 	}
 
 	return PolyMatrix{newMat, was_ntt}
-}
-
-func NewRandomPolyMatrix(rows, cols int) PolyMatrix {
-	polyVectors := make([]PolyVector, rows)
-	for i := 0; i < rows; i++ {
-		polyVectors[i] = NewRandomPolyVector(cols)
-	}
-	return PolyMatrix{polyVectors, false}
-}
-
-func NewIdentityMatrix(size int) PolyMatrix {
-	polyVectors := make([]PolyVector, size)
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			if i == j {
-				polyVectors[i].PolyProxies[j].Poly.Coeffs[0][0] = uint64(1)
-			}
-		}
-	}
-	return PolyMatrix{polyVectors, false}
-}
-
-func NewZeroMatrix(rows, cols int) PolyMatrix {
-	polyVectors := make([]PolyVector, rows)
-	for i := 0; i < rows; i++ {
-		polyVectors[i] = PolyVector{}
-	}
-	return PolyMatrix{polyVectors, false}
 }

@@ -1,4 +1,4 @@
-package pqdevkit
+package devkit
 
 /*
 	Returns x mod q, but centered around 0
@@ -18,4 +18,13 @@ func centeredModulo(x, q int64) int64 {
 		ret -= q
 	}
 	return ret
+}
+
+func containsOnlyZeroes(a []uint64) bool {
+	for _, v := range a {
+		if v != 0 {
+			return false
+		}
+	}
+	return true
 }

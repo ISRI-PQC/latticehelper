@@ -1,8 +1,18 @@
-package pqdevkit
+package devkit
+
+import "strings"
 
 type PolyVector struct {
 	PolyProxies []PolyProxy
 	IsNTT       bool
+}
+
+func NewZeroPolyVector(length int) PolyVector {
+	vec := make([]PolyProxy, length)
+	for i := 0; i < len(vec); i++ {
+		vec[i] = NewConstantPolyProxy(0)
+	}
+	return PolyVector{vec, false}
 }
 
 func NewRandomPolyVector(length int) PolyVector {
@@ -11,6 +21,19 @@ func NewRandomPolyVector(length int) PolyVector {
 		vec[i] = NewRandomPoly()
 	}
 	return PolyVector{vec, false}
+}
+
+func (vec PolyVector) String() string {
+	var sb strings.Builder
+	sb.WriteString("PolyVector{")
+	for i, poly := range vec.PolyProxies {
+		sb.WriteString(poly.String())
+		if i != len(vec.PolyProxies)-1 {
+			sb.WriteString(", ")
+		}
+	}
+	sb.WriteString("}")
+	return sb.String()
 }
 
 func (vec PolyVector) Length() int {
@@ -136,14 +159,14 @@ func (vec PolyVector) DotProduct(input_vector PolyVector) PolyProxy {
 	newPoly := MainRing.NewPoly()
 
 	for i := 0; i < vec.Length(); i++ {
-		MainRing.MulCoeffsBarrettThenAdd(vec.PolyProxies[i].Poly, input_vector.PolyProxies[i].Poly, newPoly)
+		MainRing.MulCoeffsBarrettThenAdd(*vec.PolyProxies[i].Poly, *input_vector.PolyProxies[i].Poly, newPoly)
 	}
 
 	if !was_ntt {
 		MainRing.INTT(newPoly, newPoly)
 	}
 
-	return PolyProxy{Poly: newPoly, IsNTT: was_ntt}
+	return PolyProxy{Poly: &newPoly, IsNTT: was_ntt}
 }
 
 func (vec PolyVector) MatMul(input_mat PolyMatrix) PolyVector {
@@ -168,10 +191,10 @@ func (vec PolyVector) MatMul(input_mat PolyMatrix) PolyVector {
 		currentPoly := MainRing.NewPoly()
 
 		for j := 0; j < vec.Length(); j++ {
-			MainRing.MulCoeffsBarrettThenAdd(vec.PolyProxies[j].Poly, input_mat.PolyVectors[i].PolyProxies[j].Poly, currentPoly)
+			MainRing.MulCoeffsBarrettThenAdd(*vec.PolyProxies[j].Poly, *input_mat.PolyVectors[i].PolyProxies[j].Poly, currentPoly)
 		}
 
-		newVec[i] = PolyProxy{currentPoly, true}
+		newVec[i] = PolyProxy{&currentPoly, true}
 	}
 
 	if !was_ntt {

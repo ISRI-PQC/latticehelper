@@ -1,4 +1,4 @@
-module cyber.ee/muzosh/pqdevkit
+module cyber.ee/muzosh/pq/devkit
 
 go 1.22.2
 

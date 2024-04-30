@@ -1,31 +1,77 @@
-package pqdevkit
+package devkit
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
 
 type PolyProxy struct {
-	Poly  ring.Poly
+	Poly  *ring.Poly
 	IsNTT bool
 }
 
-func NewRandomPoly() PolyProxy {
-	return PolyProxy{MainUniformSampler.ReadNew(), false}
+func NewConstantPolyProxy(constant uint64) PolyProxy {
+	ret := MainRing.NewPoly()
+	ret.Coeffs[0][0] = constant
+
+	return PolyProxy{&ret, false}
 }
 
-func (poly *PolyProxy) ToNTT() {
+func NewRandomPoly() PolyProxy {
+	ret := MainUniformSampler.ReadNew()
+	return PolyProxy{&ret, false}
+}
+
+func (poly PolyProxy) String() string {
+	coeffs := poly.Poly.Coeffs[0]
+	ret := make([]string, 0, len(coeffs)+1)
+
+	if containsOnlyZeroes(coeffs) {
+		return "0"
+	}
+
+	for i, coeff := range coeffs {
+		if coeff != 0 {
+			if i == 0 {
+				ret = append(ret, strconv.FormatUint(coeff, 10))
+			} else if i == 1 {
+				if coeff == 1 {
+					ret = append(ret, "x")
+				} else {
+					ret = append(ret, strconv.FormatUint(coeff, 10)+"*x")
+				}
+			} else {
+				if coeff == 1 {
+					ret = append(ret, "x^"+strconv.Itoa(i))
+				} else {
+					ret = append(ret, strconv.FormatUint(coeff, 10)+"*x^"+strconv.Itoa(i))
+				}
+			}
+		}
+	}
+
+	if poly.IsNTT {
+		ret = append(ret, " (NTT form)")
+	}
+
+	return strings.Join(ret, " + ")
+}
+
+func (poly PolyProxy) ToNTT() {
 	if poly.IsNTT {
 		return
 	}
-	MainRing.NTT(poly.Poly, poly.Poly)
+	MainRing.NTT(*poly.Poly, *poly.Poly)
 	poly.IsNTT = true
 }
 
-func (poly *PolyProxy) FromNTT() {
+func (poly PolyProxy) FromNTT() {
 	if !poly.IsNTT {
 		return
 	}
-	MainRing.INTT(poly.Poly, poly.Poly)
+	MainRing.INTT(*poly.Poly, *poly.Poly)
 	poly.IsNTT = false
 }
 
@@ -52,8 +98,8 @@ func (poly PolyProxy) Listize() []uint64 {
 
 func (poly PolyProxy) Neg() PolyProxy {
 	ret_poly := MainRing.NewPoly()
-	MainRing.Neg(poly.Poly, ret_poly)
-	return PolyProxy{ret_poly, poly.IsNTT}
+	MainRing.Neg(*poly.Poly, ret_poly)
+	return PolyProxy{&ret_poly, poly.IsNTT}
 }
 
 func (poly PolyProxy) Add(input_poly PolyProxy) PolyProxy {
@@ -62,9 +108,9 @@ func (poly PolyProxy) Add(input_poly PolyProxy) PolyProxy {
 	}
 
 	ret_poly := MainRing.NewPoly()
-	MainRing.Add(poly.Poly, input_poly.Poly, ret_poly)
-	
-	return PolyProxy{ret_poly, poly.IsNTT}
+	MainRing.Add(*poly.Poly, *input_poly.Poly, ret_poly)
+
+	return PolyProxy{&ret_poly, poly.IsNTT}
 }
 
 func (poly PolyProxy) Sub(input_poly PolyProxy) PolyProxy {
@@ -73,9 +119,9 @@ func (poly PolyProxy) Sub(input_poly PolyProxy) PolyProxy {
 	}
 
 	ret_poly := MainRing.NewPoly()
-	MainRing.Sub(poly.Poly, input_poly.Poly, ret_poly)
-	
-	return PolyProxy{ret_poly, poly.IsNTT}
+	MainRing.Sub(*poly.Poly, *input_poly.Poly, ret_poly)
+
+	return PolyProxy{&ret_poly, poly.IsNTT}
 }
 
 func (poly PolyProxy) Mul(input_poly PolyProxy) PolyProxy {
@@ -91,19 +137,19 @@ func (poly PolyProxy) Mul(input_poly PolyProxy) PolyProxy {
 	}
 
 	ret_poly := MainRing.NewPoly()
-	MainRing.MulCoeffsBarrett(poly.Poly, input_poly.Poly, ret_poly)
-	
+	MainRing.MulCoeffsBarrett(*poly.Poly, *input_poly.Poly, ret_poly)
+
 	if !was_ntt {
 		MainRing.INTT(ret_poly, ret_poly)
 	}
 
-	return PolyProxy{ret_poly, poly.IsNTT}
+	return PolyProxy{&ret_poly, poly.IsNTT}
 }
 
 func (poly PolyProxy) MulScalar(scalar uint64) PolyProxy {
 	ret_poly := MainRing.NewPoly()
 
-	MainRing.MulScalar(poly.Poly, scalar, ret_poly)
+	MainRing.MulScalar(*poly.Poly, scalar, ret_poly)
 
-	return PolyProxy{ret_poly, poly.IsNTT}
+	return PolyProxy{&ret_poly, poly.IsNTT}
 }

@@ -1,6 +1,4 @@
-package pqdevkit
-
-// package main
+package devkit
 
 import (
 	"fmt"
@@ -11,17 +9,28 @@ import (
 	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
 
-var MainRing *ring.Ring
-var MainUniformSampler *ring.UniformSampler
+// If you encounter [cyber.ee/muzosh/pq/common.MainRing] or
+// [cyber.ee/muzosh/pq/common.MainUniformSampler] being nil,
+// you must initialize it first using
+// [cyber.ee/muzosh/pq/common.InitSingle] or
+// [cyber.ee/muzosh/pq/common.InitMultiple] functions!
+var (
+	MainRing           *ring.Ring
+	MainUniformSampler *ring.UniformSampler
+)
 
-func Init(degree int, modulus uint64) error {
-	r, err := ring.NewRing(degree, []uint64{modulus})
+func InitSingle(degree int, modulus uint64) error {
+	return InitMultiple(degree, []uint64{modulus})
+}
+
+func InitMultiple(degree int, moduli []uint64) error {
+	r, err := ring.NewRing(degree, moduli)
 
 	if err != nil {
 		return err
 	}
 
-	MainRing = r
+	MainRing = r.AtLevel(0)
 
 	prng, err := sampling.NewPRNG()
 
@@ -43,7 +52,7 @@ const (
 func main() {
 	fmt.Println("Hello, World!")
 
-	err := Init(256, 8380417)
+	err := InitSingle(256, 8380417)
 	if err != nil {
 		panic(err)
 	}
