@@ -1,30 +1,48 @@
 package devkit
 
-/*
-	Returns x mod q, but centered around 0
+import (
+	"math/big"
 
-Args:
+	"github.com/tuneinsight/lattigo/v5/utils/sampling"
+)
 
-	x (int): number to be modded
-	q (int): modulus
+func RandUint64() uint64 {
+	return sampling.RandUint64()
+}
 
-Returns:
-
-	int: x mod q, centered around 0
-*/
-func centeredModulo(x, q int64) int64 {
-	ret := x % q
-	if ret > (q >> 1) {
-		ret -= q
-	}
+// RandFloat64 returns a random float between min and max.
+func RandFloat64(min, max float64) float64 {
+	ret := sampling.RandFloat64(min, max)
 	return ret
 }
 
-func containsOnlyZeroes(a []uint64) bool {
-	for _, v := range a {
-		if v != 0 {
-			return false
-		}
+func FloorDivision[T int | int64 | uint64](a, b T) uint64 {
+	ret := new(big.Int).Div(big.NewInt(int64(a)), big.NewInt(int64(b))).Uint64()
+	return ret
+}
+
+func InvMod[T int | int64 | uint64](d, q T) uint64 {
+	ret := new(big.Int).ModInverse(big.NewInt(int64(d)), big.NewInt(int64(q))).Uint64()
+	return ret
+}
+
+func MulMod[T int | int64 | uint64](a, b T, m uint64) uint64 {
+	ret := new(big.Int).Mod(
+		new(big.Int).Mul(big.NewInt(int64(a)), big.NewInt(int64(b))),
+		big.NewInt(int64(m)),
+	).Uint64()
+	return ret
+}
+
+func PowMod[T int | int64 | uint64](a, b, m T) uint64 {
+	ret := new(big.Int).Exp(big.NewInt(int64(a)), big.NewInt(int64(b)), big.NewInt(int64(m))).Uint64()
+	return ret
+}
+
+func PositiveMod(a int64, m uint64) uint64 {
+	ret := a % int64(m)
+	if ret < 0 {
+		ret += int64(m)
 	}
-	return true
+	return uint64(ret)
 }

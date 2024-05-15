@@ -57,7 +57,7 @@ func main() {
 		panic(err)
 	}
 
-	test()
+	// test()
 	benchmark()
 }
 
@@ -98,7 +98,7 @@ func benchmark() {
 		MainRing.NTTLazy(b, bnttlazy)
 
 		start = time.Now()
-		sb := schoolbookMultiplication(a, b)
+		sb := schoolbookMultiplicationRingPolys(a, b)
 		sbs[i] = time.Since(start)
 
 		// Barret with NTT
@@ -141,87 +141,87 @@ func benchmark() {
 	fmt.Println("BarretLazy: ", average(barretnttlazy), "µs") // (", barretnttlazy, ")")
 }
 
-func test() {
-	a := MainUniformSampler.ReadNew()
-	b := MainUniformSampler.ReadNew()
+// func test() {
+// 	a := MainUniformSampler.ReadNew()
+// 	b := MainUniformSampler.ReadNew()
 
-	sb := schoolbookMultiplication(a, b)
+// 	sb := schoolbookMultiplicationRingPolys(a, b)
 
-	var start time.Time
-	var elapsed time.Duration
-	var same bool
+// 	var start time.Time
+// 	var elapsed time.Duration
+// 	var same bool
 
-	// r1 := MainRing.NewPoly()
-	// start := time.Now()
-	// MainRing.MulCoeffsBarrett(a, b, r1)
-	// elapsed := time.Since(start)
-	// same := reflect.DeepEqual(sb, r1.Coeffs[0])
-	// fmt.Println("non-NTT barrett: ", same, " time: ", elapsed)
+// 	// r1 := MainRing.NewPoly()
+// 	// start := time.Now()
+// 	// MainRing.MulCoeffsBarrett(a, b, r1)
+// 	// elapsed := time.Since(start)
+// 	// same := reflect.DeepEqual(sb, r1.Coeffs[0])
+// 	// fmt.Println("non-NTT barrett: ", same, " time: ", elapsed)
 
-	MainRing.NTTLazy(a, a)
-	MainRing.NTTLazy(b, b)
+// 	MainRing.NTTLazy(a, a)
+// 	MainRing.NTTLazy(b, b)
 
-	r2 := MainRing.NewPoly()
-	start = time.Now()
-	MainRing.MulCoeffsBarrett(a, b, r2)
-	elapsed = time.Since(start)
-	MainRing.INTTLazy(r2, r2)
-	same = reflect.DeepEqual(sb, r2.Coeffs[0])
-	fmt.Println("NTT barrett: ", same, " time: ", elapsed)
+// 	r2 := MainRing.NewPoly()
+// 	start = time.Now()
+// 	MainRing.MulCoeffsBarrett(a, b, r2)
+// 	elapsed = time.Since(start)
+// 	MainRing.INTTLazy(r2, r2)
+// 	same = reflect.DeepEqual(sb, r2.Coeffs[0])
+// 	fmt.Println("NTT barrett: ", same, " time: ", elapsed)
 
-	r3 := MainRing.NewPoly()
-	t1 := MainRing.NewPoly()
-	// t2 := MainRing.NewPoly()
+// 	r3 := MainRing.NewPoly()
+// 	t1 := MainRing.NewPoly()
+// 	// t2 := MainRing.NewPoly()
 
-	start = time.Now()
-	MainRing.MForm(a, t1)
-	// MainRing.MForm(b, t2)
-	elapsed = time.Since(start)
-	fmt.Println("MForm: ", elapsed)
+// 	start = time.Now()
+// 	MainRing.MForm(a, t1)
+// 	// MainRing.MForm(b, t2)
+// 	elapsed = time.Since(start)
+// 	fmt.Println("MForm: ", elapsed)
 
-	start = time.Now()
-	MainRing.MulCoeffsMontgomeryLazy(t1, b, r3)
-	elapsed = time.Since(start)
-	MainRing.INTTLazy(r3, r3)
-	same = reflect.DeepEqual(sb, r3.Coeffs[0])
-	fmt.Println("NTT montgomery: ", same, " time: ", elapsed)
+// 	start = time.Now()
+// 	MainRing.MulCoeffsMontgomeryLazy(t1, b, r3)
+// 	elapsed = time.Since(start)
+// 	MainRing.INTTLazy(r3, r3)
+// 	same = reflect.DeepEqual(sb, r3.Coeffs[0])
+// 	fmt.Println("NTT montgomery: ", same, " time: ", elapsed)
 
-	// same = reflect.DeepEqual(sb, p4.Coeffs[0])
-	// fmt.Println(same)
+// 	// same = reflect.DeepEqual(sb, p4.Coeffs[0])
+// 	// fmt.Println(same)
 
-	// // ADDING
-	// a = MainUniformSampler.ReadNew()
-	// b = MainUniformSampler.ReadNew()
+// 	// // ADDING
+// 	// a = MainUniformSampler.ReadNew()
+// 	// b = MainUniformSampler.ReadNew()
 
-	// MainRing.NTT(a, a)
+// 	// MainRing.NTT(a, a)
 
-	// MainRing.INTT(a, a)
+// 	// MainRing.INTT(a, a)
 
-	// normal := addPolynomials(a, b)
+// 	// normal := addPolynomials(a, b)
 
-	// l := MainRing.NewPoly()
-	// MainRing.Add(a, b, l)
+// 	// l := MainRing.NewPoly()
+// 	// MainRing.Add(a, b, l)
 
-	// same = reflect.DeepEqual(normal, l.Coeffs[0])
-	// fmt.Println(same)
+// 	// same = reflect.DeepEqual(normal, l.Coeffs[0])
+// 	// fmt.Println(same)
 
-	// MainRing.NTT(a, a)
-	// MainRing.NTT(b, b)
-	// l2 := MainRing.NewPoly()
-	// MainRing.Add(a, b, l2)
-	// MainRing.INTT(l2, l2)
+// 	// MainRing.NTT(a, a)
+// 	// MainRing.NTT(b, b)
+// 	// l2 := MainRing.NewPoly()
+// 	// MainRing.Add(a, b, l2)
+// 	// MainRing.INTT(l2, l2)
 
-	// same = reflect.DeepEqual(normal, l2.Coeffs[0])
-	// fmt.Println(same)
+// 	// same = reflect.DeepEqual(normal, l2.Coeffs[0])
+// 	// fmt.Println(same)
 
-	// l3 := MainRing.NewPoly()
-	// MainRing.INTT(a, a)
-	// MainRing.INTT(b, b)
-	// MainRing.Add(a, b, l3)
+// 	// l3 := MainRing.NewPoly()
+// 	// MainRing.INTT(a, a)
+// 	// MainRing.INTT(b, b)
+// 	// MainRing.Add(a, b, l3)
 
-	// same = reflect.DeepEqual(normal, l3.Coeffs[0])
-	// fmt.Println(same)
-}
+// 	// same = reflect.DeepEqual(normal, l3.Coeffs[0])
+// 	// fmt.Println(same)
+// }
 
 func average(values []time.Duration) float32 {
 	var total time.Duration
@@ -233,7 +233,7 @@ func average(values []time.Duration) float32 {
 	return float32(total.Microseconds()) / float32(len(values))
 }
 
-func schoolbookMultiplication(p1, p2 ring.Poly) []uint64 {
+func schoolbookMultiplicationRingPolys(p1, p2 ring.Poly) []uint64 {
 	n := MainRing.N()
 	a := make([]int64, n)
 	b := make([]int64, n)
@@ -246,29 +246,23 @@ func schoolbookMultiplication(p1, p2 ring.Poly) []uint64 {
 		b[i] = int64(coeff)
 	}
 
-	new_coeffs := make([]int64, n)
+	newCoeffs := make([]int64, n)
 	ret := make([]uint64, n)
 
 	for i := 0; i < n; i++ {
 		for j := 0; j < (n - i); j++ {
-			new_coeffs[i+j] += (a[i] * b[j])
+			newCoeffs[i+j] += (a[i] * b[j])
 		}
 	}
 
 	for j := 1; j < n; j++ {
 		for i := (n - j); i < n; i++ {
-			new_coeffs[i+j-n] -= (a[i] * b[j])
+			newCoeffs[i+j-n] -= (a[i] * b[j])
 		}
 	}
 
-	for i := range new_coeffs {
-		new_coeffs[i] %= MainRing.Modulus().Int64()
-
-		if new_coeffs[i] < 0 {
-			new_coeffs[i] += MainRing.Modulus().Int64()
-		}
-
-		ret[i] = uint64(new_coeffs[i])
+	for i := range newCoeffs {
+		ret[i] = PositiveMod(newCoeffs[i], MainRing.Modulus().Uint64())
 	}
 
 	return ret
@@ -278,9 +272,6 @@ func addPolynomials(p1, p2 ring.Poly) []uint64 {
 	n := MainRing.N()
 	a := make([]uint64, n)
 	b := make([]uint64, n)
-
-	// fmt.Println("p1: ", p1)
-	// fmt.Println("p2: ", p2)
 
 	for i, coeff := range p1.Coeffs[0] {
 		a[i] = uint64(coeff)
