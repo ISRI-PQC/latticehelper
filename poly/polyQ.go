@@ -49,6 +49,25 @@ func NewRandomPolyQ() PolyQ {
 	return PolyQ{&ret}
 }
 
+func (poly PolyQ) GobEncode() ([]byte, error) {
+	return poly.Poly.MarshalBinary()
+}
+
+func (poly *PolyQ) GobDecode(data []byte) error {
+	poly.Poly = new(ring.Poly)
+	return poly.Poly.UnmarshalBinary(data)
+}
+
+func (poly PolyQ) Serialize() (p []byte, err error) {
+	return poly.GobEncode()
+}
+
+func DeserializePolyQ(data []byte) (PolyQ, error) {
+	p := NewPolyQ()
+	err := p.GobDecode(data)
+	return p, err
+}
+
 func (poly PolyQ) CoeffString() string {
 	return strings.Replace(fmt.Sprint(poly.Listize()), " ", ",", -1)
 }

@@ -1,7 +1,6 @@
 package poly
 
 import (
-	"math/big"
 	"testing"
 
 	"cyber.ee/muzosh/pq/devkit"

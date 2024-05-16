@@ -61,6 +61,22 @@ func NewRandomPoly() Poly {
 // 	return uint64(max)
 // }
 
+func (coeffs Poly) Serialize() ([]byte, error) {
+	GobBuffer.Reset()
+	err := GobEncoder.Encode(coeffs)
+	ret := GobBuffer.Bytes()
+	GobBuffer.Reset()
+	return ret, err
+}
+
+func DeserializePoly(data []byte) (Poly, error) {
+	GobBuffer.Reset()
+	var p Poly
+	err := GobDecoder.Decode(&p)
+	GobBuffer.Reset()
+	return p, err
+}
+
 func (coeffs Poly) CoeffString() string {
 	return strings.Replace(fmt.Sprint(coeffs.Listize()), " ", ",", -1)
 }

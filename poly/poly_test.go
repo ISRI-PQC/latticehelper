@@ -2,8 +2,6 @@ package poly
 
 import (
 	"testing"
-
-	"cyber.ee/muzosh/pq/devkit"
 )
 
 func TestPolyNeg(t *testing.T) {

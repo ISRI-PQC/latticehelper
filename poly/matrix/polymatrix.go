@@ -10,6 +10,22 @@ import (
 
 type PolyMatrix []vector.PolyVector
 
+func (mat PolyMatrix) Serialize() ([]byte, error) {
+	poly.GobBuffer.Reset()
+	err := poly.GobEncoder.Encode(mat)
+	ret := poly.GobBuffer.Bytes()
+	poly.GobBuffer.Reset()
+	return ret, err
+}
+
+func DeserializePolyMatrix(data []byte) (PolyMatrix, error) {
+	poly.GobBuffer.Reset()
+	var p PolyMatrix
+	err := poly.GobDecoder.Decode(&p)
+	poly.GobBuffer.Reset()
+	return p, err
+}
+
 func NewPolyMatrixFromCoeffs(coeffMat [][][]int64) PolyMatrix {
 	newMatrix := make(PolyMatrix, len(coeffMat))
 	for i := range coeffMat {

@@ -9,6 +9,21 @@ import (
 
 type PolyVector []poly.Poly
 
+func (vec PolyVector) Serialize() ([]byte, error) {
+	poly.GobBuffer.Reset()
+	err := poly.GobEncoder.Encode(vec)
+	ret := poly.GobBuffer.Bytes()
+	poly.GobBuffer.Reset()
+	return ret, err
+}
+
+func DeserializePolyVector(data []byte) (PolyVector, error) {
+	poly.GobBuffer.Reset()
+	var p PolyVector
+	err := poly.GobDecoder.Decode(&p)
+	poly.GobBuffer.Reset()
+	return p, err
+}
 
 func NewPolyVectorFromCoeffs(coeffs [][]int64) PolyVector {
 	vec := make(PolyVector, len(coeffs))
@@ -17,7 +32,6 @@ func NewPolyVectorFromCoeffs(coeffs [][]int64) PolyVector {
 	}
 	return vec
 }
-
 
 func NewZeroPolyVector(length int) PolyVector {
 	vec := make(PolyVector, length)
