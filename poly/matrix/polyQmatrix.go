@@ -11,19 +11,14 @@ import (
 type PolyQMatrix []vector.PolyQVector
 
 func (mat PolyQMatrix) Serialize() ([]byte, error) {
-	poly.GobBuffer.Reset()
-	err := poly.GobEncoder.Encode(mat)
-	ret := poly.GobBuffer.Bytes()
-	poly.GobBuffer.Reset()
-	return ret, err
+	return devkit.SerializeObject(mat)
 }
 
 func DeserializePolyQMatrix(data []byte) (PolyQMatrix, error) {
-	poly.GobBuffer.Reset()
-	var p PolyQMatrix
-	err := poly.GobDecoder.Decode(&p)
-	poly.GobBuffer.Reset()
-	return p, err
+
+	var mat PolyQMatrix
+	err := devkit.DeserializeObject(data, &mat)
+	return mat, err
 }
 
 func NewPolyQMatrixFromCoeffs(coeffMat [][][]int64) PolyQMatrix {

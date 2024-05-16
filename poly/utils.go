@@ -1,16 +1,8 @@
 package poly
 
 import (
-	"bytes"
-	"encoding/gob"
-
 	"cyber.ee/muzosh/pq/devkit"
 )
-
-var GobBuffer = bytes.Buffer{}
-
-var GobEncoder = gob.NewEncoder(&GobBuffer)
-var GobDecoder = gob.NewDecoder(&GobBuffer)
 
 /*
 	Returns x mod q, but centered around 0

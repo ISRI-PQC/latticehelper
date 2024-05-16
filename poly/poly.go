@@ -62,18 +62,12 @@ func NewRandomPoly() Poly {
 // }
 
 func (coeffs Poly) Serialize() ([]byte, error) {
-	GobBuffer.Reset()
-	err := GobEncoder.Encode(coeffs)
-	ret := GobBuffer.Bytes()
-	GobBuffer.Reset()
-	return ret, err
+	return devkit.SerializeObject(coeffs)
 }
 
 func DeserializePoly(data []byte) (Poly, error) {
-	GobBuffer.Reset()
 	var p Poly
-	err := GobDecoder.Decode(&p)
-	GobBuffer.Reset()
+	err := devkit.DeserializeObject(data, &p)
 	return p, err
 }
 

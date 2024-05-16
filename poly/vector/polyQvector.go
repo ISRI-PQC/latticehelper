@@ -10,19 +10,13 @@ import (
 type PolyQVector []poly.PolyQ
 
 func (vec PolyQVector) Serialize() ([]byte, error) {
-	poly.GobBuffer.Reset()
-	err := poly.GobEncoder.Encode(vec)
-	ret := poly.GobBuffer.Bytes()
-	poly.GobBuffer.Reset()
-	return ret, err
+	return devkit.SerializeObject(vec)
 }
 
 func DeserializePolyQVector(data []byte) (PolyQVector, error) {
-	poly.GobBuffer.Reset()
-	var p PolyQVector
-	err := poly.GobDecoder.Decode(&p)
-	poly.GobBuffer.Reset()
-	return p, err
+	var vec PolyQVector
+	err := devkit.DeserializeObject(data, &vec)
+	return vec, err
 }
 
 func NewPolyQVectorFromCoeffs(coeffs [][]int64) PolyQVector {

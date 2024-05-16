@@ -1,10 +1,32 @@
 package devkit
 
 import (
+	"bytes"
+	"encoding/gob"
 	"math/big"
 
 	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
+
+var GobBuffer = bytes.Buffer{}
+
+var GobEncoder = gob.NewEncoder(&GobBuffer)
+var GobDecoder = gob.NewDecoder(&GobBuffer)
+
+func SerializeObject(obj any) ([]byte, error) {
+	GobBuffer.Reset()
+	err := GobEncoder.Encode(obj)
+	GobBuffer.Reset()
+	return GobBuffer.Bytes(), err
+}
+
+func DeserializeObject(data []byte, obj any) error {
+	GobBuffer.Reset()
+	GobBuffer.Write(data)
+	err := GobDecoder.Decode(obj)
+	GobBuffer.Reset()
+	return err
+}
 
 func RandUint64() uint64 {
 	return sampling.RandUint64()
