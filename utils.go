@@ -16,8 +16,9 @@ var GobDecoder = gob.NewDecoder(&GobBuffer)
 func SerializeObject(obj any) ([]byte, error) {
 	GobBuffer.Reset()
 	err := GobEncoder.Encode(obj)
+	bytes := GobBuffer.Bytes()
 	GobBuffer.Reset()
-	return GobBuffer.Bytes(), err
+	return bytes, err
 }
 
 func DeserializeObject(data []byte, obj any) error {
