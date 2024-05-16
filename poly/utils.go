@@ -1,6 +1,8 @@
 package poly
 
 import (
+	"log"
+
 	"cyber.ee/muzosh/pq/devkit"
 )
 
@@ -35,7 +37,7 @@ func containsOnlyZeroes[V uint64 | int64](a []V) bool {
 
 func schoolbookMultiplication(p1, p2 []int64) []int64 {
 	if len(p1) != len(p2) {
-		panic("schoolbookMultiplication: p1 and p2 must be of the same length")
+		log.Panic("schoolbookMultiplication: p1 and p2 must be of the same length")
 	}
 	n := devkit.MainRing.N()
 

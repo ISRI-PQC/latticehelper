@@ -1,6 +1,7 @@
 package vector
 
 import (
+	"log"
 	"strings"
 
 	"cyber.ee/muzosh/pq/devkit"
@@ -118,7 +119,8 @@ func (vec PolyVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyV
 		}
 		return newVec
 	default:
-		panic("Invalid PolyProxyVector.")
+		log.Panic("Invalid PolyProxyVector.")
+		return nil
 	}
 }
 
@@ -133,7 +135,7 @@ func (vec PolyVector) ScaleByInt(input int64) PolyProxyVector {
 
 func (vec PolyVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
 	if inputPolyProxyVector.Length() != vec.Length() {
-		panic("Add: two vectors don't have the same length.")
+		log.Panic("Add: two vectors don't have the same length.")
 	}
 
 	switch input := inputPolyProxyVector.(type) {
@@ -153,13 +155,14 @@ func (vec PolyVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector 
 		}
 		return newVec
 	default:
-		panic("Invalid PolyProxyVector.")
+		log.Panic("Invalid PolyProxyVector.")
+		return nil
 	}
 }
 
 func (vec PolyVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
 	if inputPolyProxyVector.Length() != vec.Length() {
-		panic("Sub: two vectors don't have the same length.")
+		log.Panic("Sub: two vectors don't have the same length.")
 	}
 
 	switch input := inputPolyProxyVector.(type) {
@@ -179,7 +182,8 @@ func (vec PolyVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector 
 		}
 		return newVec
 	default:
-		panic("Invalid PolyProxyVector.")
+		log.Panic("Invalid PolyProxyVector.")
+		return nil
 	}
 }
 
@@ -198,13 +202,14 @@ func (vec PolyVector) Concat(inputPolyProxyVector PolyProxyVector) PolyProxyVect
 		newVec = append(newVec, input...)
 		return newVec
 	default:
-		panic("Invalid PolyProxyVector.")
+		log.Panic("Invalid PolyProxyVector.")
+		return nil
 	}
 }
 
 func (vec PolyVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.PolyProxy {
 	if inputPolyProxyVector.Length() != vec.Length() {
-		panic("DotProduct: two vectors don't have the same length.")
+		log.Panic("DotProduct: two vectors don't have the same length.")
 	}
 
 	switch input := inputPolyProxyVector.(type) {
@@ -233,7 +238,8 @@ func (vec PolyVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.Poly
 		devkit.MainRing.INTT(*newPoly.Poly, *newPoly.Poly)
 		return newPoly
 	default:
-		panic("Invalid PolyProxyVector.")
+		log.Panic("Invalid PolyProxyVector.")
+		return nil
 	}
 }
 

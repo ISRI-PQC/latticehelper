@@ -2,6 +2,7 @@ package devkit
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"time"
 
@@ -54,7 +55,7 @@ func main() {
 
 	err := InitSingle(256, 8380417)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	// test()
@@ -113,7 +114,7 @@ func benchmark() {
 
 		same = reflect.DeepEqual(r.Coeffs[0], sb)
 		if !same {
-			panic("Barret with NTT not same")
+			log.Fatal("Barret with NTT not same")
 		}
 
 		// Barret with NTTLazy
@@ -128,7 +129,7 @@ func benchmark() {
 
 		same = reflect.DeepEqual(r.Coeffs[0], sb)
 		if !same {
-			panic("Barret with NTT Lazy not same")
+			log.Fatal("Barret with NTT Lazy not same")
 		}
 	}
 

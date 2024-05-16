@@ -1,6 +1,7 @@
 package vector
 
 import (
+	"log"
 	"strings"
 
 	"cyber.ee/muzosh/pq/devkit"
@@ -121,7 +122,7 @@ func (vec PolyQVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector
 	}
 
 	if vec.Length() != inputPolyQVector.Length() {
-		panic("Add: length of input vector is not equal to length of vector")
+		log.Panic("Add: length of input vector is not equal to length of vector")
 	}
 
 	newVec := make(PolyQVector, vec.Length())
@@ -142,7 +143,7 @@ func (vec PolyQVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector
 	}
 
 	if vec.Length() != inputPolyQVector.Length() {
-		panic("Sub: length of input vector is not equal to length of vector")
+		log.Panic("Sub: length of input vector is not equal to length of vector")
 	}
 
 	newVec := make(PolyQVector, vec.Length())
@@ -181,7 +182,7 @@ func (vec PolyQVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.Pol
 	}
 
 	if inputPolyQVector.Length() != vec.Length() {
-		panic("DotProduct: two vectors don't have the same length.")
+		log.Panic("DotProduct: two vectors don't have the same length.")
 	}
 
 	newPoly := poly.NewPolyQ()

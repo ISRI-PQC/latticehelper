@@ -2,6 +2,7 @@ package poly
 
 import (
 	"fmt"
+	"log"
 	"math/big"
 	"strconv"
 	"strings"
@@ -196,7 +197,7 @@ func (poly PolyQ) Mul(inputPolyProxy PolyProxy) PolyProxy {
 
 func (poly PolyQ) Pow(exp int) PolyProxy {
 	if exp < 0 {
-		panic("Pow: Negative powers are not supported for elements of a PolyQ")
+		log.Panic("Pow: Negative powers are not supported for elements of a PolyQ")
 	}
 
 	g := NewConstantPolyQ(1)

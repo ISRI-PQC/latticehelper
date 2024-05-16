@@ -2,6 +2,7 @@ package poly
 
 import (
 	"fmt"
+	"log"
 	"math/big"
 	"math/rand"
 	"reflect"
@@ -145,7 +146,8 @@ func (coeffs Poly) Add(inputPolyProxy PolyProxy) PolyProxy {
 	case PolyQ:
 		return coeffs.TransformedToPolyQ().Add(input)
 	default:
-		panic("Invalid PolyProxy")
+		log.Panic("Invalid PolyProxy")
+		return nil
 	}
 }
 
@@ -160,7 +162,8 @@ func (coeffs Poly) Sub(inputPolyProxy PolyProxy) PolyProxy {
 	case PolyQ:
 		return coeffs.TransformedToPolyQ().Sub(input)
 	default:
-		panic("Invalid PolyProxy")
+		log.Panic("Invalid PolyProxy")
+		return nil
 	}
 }
 
@@ -171,13 +174,14 @@ func (coeffs Poly) Mul(inputPolyProxy PolyProxy) PolyProxy {
 	case PolyQ:
 		return coeffs.TransformedToPolyQ().Mul(input)
 	default:
-		panic("Invalid PolyProxy")
+		log.Panic("Invalid PolyProxy")
+		return nil
 	}
 }
 
 func (poly Poly) Pow(exp int) PolyProxy {
 	if exp < 0 {
-		panic("Pow: Negative powers are not supported for elements of a PolyQ")
+		log.Panic("Pow: Negative powers are not supported for elements of a PolyQ")
 	}
 
 	g := NewConstantPoly(1)

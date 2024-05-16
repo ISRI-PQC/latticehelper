@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"log"
 	"strings"
 
 	"cyber.ee/muzosh/pq/devkit"
@@ -157,7 +158,7 @@ func (mat PolyMatrix) ScaleByInt(input int64) PolyProxyMatrix {
 
 func (mat PolyMatrix) Add(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 	if mat.Cols() != inputPolyProxyMat.Cols() || mat.Rows() != inputPolyProxyMat.Rows() {
-		panic("Add: rows and cols of matrices are not equal")
+		log.Panic("Add: rows and cols of matrices are not equal")
 	}
 
 	switch input := inputPolyProxyMat.(type) {
@@ -177,13 +178,14 @@ func (mat PolyMatrix) Add(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 		}
 		return newMat
 	default:
-		panic("Invalid PolyProxyMatrix.")
+		log.Panic("Invalid PolyProxyMatrix.")
+		return nil
 	}
 }
 
 func (mat PolyMatrix) Sub(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 	if mat.Cols() != inputPolyProxyMat.Cols() || mat.Rows() != inputPolyProxyMat.Rows() {
-		panic("Sub: rows and cols of matrices are not equal")
+		log.Panic("Sub: rows and cols of matrices are not equal")
 	}
 
 	switch input := inputPolyProxyMat.(type) {
@@ -203,13 +205,14 @@ func (mat PolyMatrix) Sub(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 		}
 		return newMat
 	default:
-		panic("Invalid PolyProxyMatrix.")
+		log.Panic("Invalid PolyProxyMatrix.")
+		return nil
 	}
 }
 
 func (mat PolyMatrix) Concat(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 	if mat.Rows() != inputPolyProxyMat.Rows() {
-		panic("Concat: rows of matrices are not equal")
+		log.Panic("Concat: rows of matrices are not equal")
 	}
 
 	switch input := inputPolyProxyMat.(type) {
@@ -229,13 +232,14 @@ func (mat PolyMatrix) Concat(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix 
 		}
 		return newMat
 	default:
-		panic("Invalid PolyProxyMatrix.")
+		log.Panic("Invalid PolyProxyMatrix.")
+		return nil
 	}
 }
 
 func (mat PolyMatrix) BlockCombine(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 	if mat.Cols() != inputPolyProxyMat.Cols() {
-		panic("BlockCombine: cols of matrices are not equal")
+		log.Panic("BlockCombine: cols of matrices are not equal")
 	}
 
 	switch input := inputPolyProxyMat.(type) {
@@ -253,13 +257,14 @@ func (mat PolyMatrix) BlockCombine(inputPolyProxyMat PolyProxyMatrix) PolyProxyM
 
 		return newMat
 	default:
-		panic("Invalid PolyProxyMatrix.")
+		log.Panic("Invalid PolyProxyMatrix.")
+		return nil
 	}
 }
 
 func (mat PolyMatrix) MatMul(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix {
 	if mat.Cols() != inputPolyProxyMat.Rows() {
-		panic("MatMul: Number of cols in first mat is not equal to number of rows in second mat")
+		log.Panic("MatMul: Number of cols in first mat is not equal to number of rows in second mat")
 	}
 
 	switch input := inputPolyProxyMat.(type) {
@@ -322,13 +327,14 @@ func (mat PolyMatrix) MatMul(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix 
 
 		return newMat
 	default:
-		panic("Invalid PolyProxyMatrix.")
+		log.Panic("Invalid PolyProxyMatrix.")
+		return nil
 	}
 }
 
 func (mat PolyMatrix) VecMul(inputPolyProxyVector vector.PolyProxyVector) vector.PolyProxyVector {
 	if inputPolyProxyVector.Length() != mat.Cols() {
-		panic("VecMul: vectors don't have the same length")
+		log.Panic("VecMul: vectors don't have the same length")
 	}
 
 	switch input := inputPolyProxyVector.(type) {
@@ -369,7 +375,8 @@ func (mat PolyMatrix) VecMul(inputPolyProxyVector vector.PolyProxyVector) vector
 
 		return newVec
 	default:
-		panic("Invalid PolyProxyMatrix.")
+		log.Panic("Invalid PolyProxyMatrix.")
+		return nil
 	}
 }
 
