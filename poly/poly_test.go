@@ -2,7 +2,25 @@ package poly
 
 import (
 	"testing"
+
+	"cyber.ee/muzosh/pq/devkit"
 )
+
+func TestMain(m *testing.M) {
+	devkit.InitSingle(128, 4294954753)
+	m.Run()
+}
+
+func TestPolySerialize(t *testing.T) {
+	p := NewRandomPoly()
+	b := p.Serialize()
+
+	n := DeserializePoly(b)
+
+	if !n.Equals(p) {
+		t.Error("Poly serialization failed")
+	}
+}
 
 func TestPolyNeg(t *testing.T) {
 	result := NewPolyFromCoeffs(1, 2, 3, 4).Neg()

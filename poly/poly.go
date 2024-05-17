@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"cyber.ee/muzosh/pq/devkit"
+	"github.com/raszia/gotiny"
 )
 
 type Poly []int64
@@ -45,31 +46,17 @@ func NewRandomPoly() Poly {
 	return ret
 }
 
-// func (poly Poly) InfiniteNorm() uint64 {
-// 	max := int64(0)
-// 	for _, coeff := range poly.Listize() {
-// 		centeredCoeff := centeredModulo(int64(coeff), devkit.MainRing.Modulus().Int64())
-
-// 		// We need absolute value
-// 		if centeredCoeff < 0 {
-// 			centeredCoeff = -centeredCoeff
-// 		}
-
-// 		if centeredCoeff > max {
-// 			max = centeredCoeff
-// 		}
-// 	}
-// 	return uint64(max)
-// }
-
-func (coeffs Poly) Serialize() ([]byte, error) {
-	return devkit.SerializeObject(coeffs)
+func (coeffs Poly) Serialize() []byte {
+	return gotiny.MarshalCompress(&coeffs)
 }
 
-func DeserializePoly(data []byte) (Poly, error) {
+func DeserializePoly(data []byte) Poly {
 	var p Poly
-	err := devkit.DeserializeObject(data, &p)
-	return p, err
+	n := gotiny.UnmarshalCompress(data, &p)
+	if n == 0 {
+		panic("failed to deserialize")
+	}
+	return p
 }
 
 func (coeffs Poly) CoeffString() string {

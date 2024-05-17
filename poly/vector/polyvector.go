@@ -6,18 +6,22 @@ import (
 
 	"cyber.ee/muzosh/pq/devkit"
 	"cyber.ee/muzosh/pq/devkit/poly"
+	"github.com/raszia/gotiny"
 )
 
 type PolyVector []poly.Poly
 
-func (vec PolyVector) Serialize() ([]byte, error) {
-	return devkit.SerializeObject(vec)
+func (vec PolyVector) Serialize() []byte {
+	return gotiny.MarshalCompress(&vec)
 }
 
-func DeserializePolyVector(data []byte) (PolyVector, error) {
+func DeserializePolyVector(data []byte) PolyVector {
 	var vec PolyVector
-	err := devkit.DeserializeObject(data, &vec)
-	return vec, err
+	n := gotiny.UnmarshalCompress(data, &vec)
+	if n == 0 {
+		panic("failed to deserialize")
+	}
+	return vec
 }
 
 func NewPolyVectorFromCoeffs(coeffs [][]int64) PolyVector {

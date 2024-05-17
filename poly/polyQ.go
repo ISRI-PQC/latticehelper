@@ -50,23 +50,21 @@ func NewRandomPolyQ() PolyQ {
 	return PolyQ{&ret}
 }
 
-func (poly PolyQ) GobEncode() ([]byte, error) {
-	return poly.Poly.MarshalBinary()
+func (poly PolyQ) Serialize() []byte {
+	b, err := poly.Poly.MarshalBinary()
+	if err != nil {
+		panic(err)
+	}
+	return b
 }
 
-func (poly *PolyQ) GobDecode(data []byte) error {
-	poly.Poly = new(ring.Poly)
-	return poly.Poly.UnmarshalBinary(data)
-}
-
-func (poly PolyQ) Serialize() (p []byte, err error) {
-	return poly.GobEncode()
-}
-
-func DeserializePolyQ(data []byte) (PolyQ, error) {
+func DeserializePolyQ(data []byte) PolyQ {
 	p := NewPolyQ()
-	err := p.GobDecode(data)
-	return p, err
+	err := p.Poly.UnmarshalBinary(data)
+	if err != nil {
+		panic(err)
+	}
+	return p
 }
 
 func (poly PolyQ) CoeffString() string {

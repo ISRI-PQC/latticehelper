@@ -1,25 +1,48 @@
 package matrix
 
 import (
+	"bytes"
+	"encoding/binary"
 	"log"
 	"strings"
 
 	"cyber.ee/muzosh/pq/devkit"
 	"cyber.ee/muzosh/pq/devkit/poly"
 	"cyber.ee/muzosh/pq/devkit/poly/vector"
+	"github.com/raszia/gotiny"
 )
 
 type PolyQMatrix []vector.PolyQVector
 
-func (mat PolyQMatrix) Serialize() ([]byte, error) {
-	return devkit.SerializeObject(mat)
+func (mat PolyQMatrix) Serialize() []byte {
+	buf := bytes.Buffer{}
+	err := binary.Write(&buf, binary.LittleEndian, uint16(mat.Rows()))
+	if err != nil {
+		panic(err)
+	}
+	err = binary.Write(&buf, binary.LittleEndian, uint16(mat.Cols()))
+	if err != nil {
+		panic(err)
+	}
+	_, err = buf.Write(gotiny.MarshalCompress(&mat))
+	if err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
 }
 
-func DeserializePolyQMatrix(data []byte) (PolyQMatrix, error) {
+func DeserializePolyQMatrix(data []byte) PolyQMatrix {
+	var rows, cols uint16
+	_ = binary.Read(bytes.NewReader(data[:2]), binary.LittleEndian, &rows)
+	_ = binary.Read(bytes.NewReader(data[2:4]), binary.LittleEndian, &cols)
 
-	var mat PolyQMatrix
-	err := devkit.DeserializeObject(data, &mat)
-	return mat, err
+	p := NewZeroPolyQMatrix(int(rows), int(cols))
+	n := gotiny.UnmarshalCompress(data[4:], &p)
+	if n == 0 {
+		panic("failed to deserialize PolyQVector")
+	}
+
+	return p
 }
 
 func NewPolyQMatrixFromCoeffs(coeffMat [][][]int64) PolyQMatrix {

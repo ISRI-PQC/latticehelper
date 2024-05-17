@@ -1,23 +1,42 @@
 package vector
 
 import (
+	"bytes"
+	"encoding/binary"
 	"log"
 	"strings"
 
 	"cyber.ee/muzosh/pq/devkit"
 	"cyber.ee/muzosh/pq/devkit/poly"
+	"github.com/raszia/gotiny"
 )
 
 type PolyQVector []poly.PolyQ
 
-func (vec PolyQVector) Serialize() ([]byte, error) {
-	return devkit.SerializeObject(vec)
+func (vec PolyQVector) Serialize() []byte {
+	buf := bytes.Buffer{}
+	err := binary.Write(&buf, binary.LittleEndian, uint16(vec.Length()))
+	if err != nil {
+		panic(err)
+	}
+	_, err = buf.Write(gotiny.MarshalCompress(&vec))
+	if err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
 }
 
-func DeserializePolyQVector(data []byte) (PolyQVector, error) {
-	var vec PolyQVector
-	err := devkit.DeserializeObject(data, &vec)
-	return vec, err
+func DeserializePolyQVector(data []byte) PolyQVector {
+	var len uint16
+	_ = binary.Read(bytes.NewReader(data[:2]), binary.LittleEndian, &len)
+
+	p := NewZeroPolyQVector(int(len))
+	n := gotiny.UnmarshalCompress(data[2:], &p)
+	if n == 0 {
+		panic("failed to deserialize PolyQVector")
+	}
+
+	return p
 }
 
 func NewPolyQVectorFromCoeffs(coeffs [][]int64) PolyQVector {
@@ -31,7 +50,7 @@ func NewPolyQVectorFromCoeffs(coeffs [][]int64) PolyQVector {
 func NewZeroPolyQVector(length int) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
-		vec[i] = poly.NewConstantPolyQ(0)
+		vec[i] = poly.NewPolyQ()
 	}
 	return vec
 }

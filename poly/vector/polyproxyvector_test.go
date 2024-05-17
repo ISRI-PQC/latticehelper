@@ -7,8 +7,30 @@ import (
 	"cyber.ee/muzosh/pq/devkit/poly"
 )
 
-func init() {
+func TestMain(m *testing.M) {
 	devkit.InitSingle(128, 4294954753)
+	m.Run()
+}
+
+func TestPolyVectorSerialize(t *testing.T) {
+	p := NewRandomPolyVector(5)
+	b := p.Serialize()
+
+	n := DeserializePolyVector(b)
+
+	if !n.Equals(p) {
+		t.Error("PolyVector serialization failed")
+	}
+}
+func TestPolyQVectorSerialize(t *testing.T) {
+	p := NewRandomPolyQVector(5)
+	b := p.Serialize()
+
+	n := DeserializePolyQVector(b)
+
+	if !n.Equals(p) {
+		t.Error("PolyQVector serialization failed")
+	}
 }
 
 func TestPolyVectorDotProduct(t *testing.T) {
