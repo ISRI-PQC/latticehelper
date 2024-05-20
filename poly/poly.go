@@ -11,6 +11,7 @@ import (
 
 	"cyber.ee/pq/devkit"
 	"github.com/raszia/gotiny"
+	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
 
 type Poly []int64
@@ -38,7 +39,7 @@ func NewConstantPoly(constant int64) Poly {
 func NewRandomPoly() Poly {
 	ret := make(Poly, devkit.MainRing.N())
 	for i := 0; i < len(ret); i++ {
-		ret[i] = rand.Int63() >> 8
+		ret[i] = int64(sampling.RandUint64()) >> 8
 		if chance := rand.Float32(); chance < 0.5 {
 			ret[i] *= -1
 		}
