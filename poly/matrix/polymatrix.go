@@ -4,9 +4,9 @@ import (
 	"log"
 	"strings"
 
-	"cyber.ee/muzosh/pq/devkit"
-	"cyber.ee/muzosh/pq/devkit/poly"
-	"cyber.ee/muzosh/pq/devkit/poly/vector"
+	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/devkit/poly"
+	"cyber.ee/pq/devkit/poly/vector"
 	"github.com/raszia/gotiny"
 )
 

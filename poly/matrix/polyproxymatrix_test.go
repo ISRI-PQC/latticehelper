@@ -3,7 +3,7 @@ package matrix
 import (
 	"testing"
 
-	"cyber.ee/muzosh/pq/devkit"
+	"cyber.ee/pq/devkit"
 )
 
 func TestMain(m *testing.M) {

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cyber.ee/muzosh/pq/devkit"
+	"cyber.ee/pq/devkit"
 	"github.com/raszia/gotiny"
 )
 

@@ -3,7 +3,7 @@ package poly
 import (
 	"log"
 
-	"cyber.ee/muzosh/pq/devkit"
+	"cyber.ee/pq/devkit"
 )
 
 /*

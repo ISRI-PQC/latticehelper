@@ -3,8 +3,8 @@ package vector
 import (
 	"testing"
 
-	"cyber.ee/muzosh/pq/devkit"
-	"cyber.ee/muzosh/pq/devkit/poly"
+	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/devkit/poly"
 )
 
 func TestMain(m *testing.M) {

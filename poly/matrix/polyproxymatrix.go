@@ -1,8 +1,8 @@
 package matrix
 
 import (
-	"cyber.ee/muzosh/pq/devkit/poly"
-	"cyber.ee/muzosh/pq/devkit/poly/vector"
+	"cyber.ee/pq/devkit/poly"
+	"cyber.ee/pq/devkit/poly/vector"
 )
 
 type PolyProxyMatrix interface {

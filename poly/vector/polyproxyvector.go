@@ -1,6 +1,6 @@
 package vector
 
-import "cyber.ee/muzosh/pq/devkit/poly"
+import "cyber.ee/pq/devkit/poly"
 
 type PolyProxyVector interface {
 	String() string

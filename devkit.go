@@ -5,11 +5,11 @@ import (
 	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
 
-// If you encounter [cyber.ee/muzosh/pq/common.MainRing] or
-// [cyber.ee/muzosh/pq/common.MainUniformSampler] being nil,
+// If you encounter [cyber.ee/pq/common.MainRing] or
+// [cyber.ee/pq/common.MainUniformSampler] being nil,
 // you must initialize it first using
-// [cyber.ee/muzosh/pq/common.InitSingle] or
-// [cyber.ee/muzosh/pq/common.InitMultiple] functions!
+// [cyber.ee/pq/common.InitSingle] or
+// [cyber.ee/pq/common.InitMultiple] functions!
 var (
 	MainRing           *ring.Ring
 	MainUniformSampler *ring.UniformSampler

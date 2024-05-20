@@ -1,8 +1,8 @@
 package matrix
 
 import (
-	"cyber.ee/muzosh/pq/devkit"
-	"cyber.ee/muzosh/pq/devkit/poly"
+	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/devkit/poly"
 )
 
 // Used to get polynomial matrices to integer matrices while

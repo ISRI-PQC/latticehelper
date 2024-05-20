@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 
-	"cyber.ee/muzosh/pq/devkit"
-	"cyber.ee/muzosh/pq/devkit/poly"
+	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/devkit/poly"
 	"github.com/raszia/gotiny"
 )
 
