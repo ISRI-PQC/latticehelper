@@ -63,6 +63,28 @@ func NewRandomPolyQVector(length int) PolyQVector {
 	return vec
 }
 
+func NewRandomPolyQVectorWithMaxInfNorm(length int, maxInfNorm int) PolyQVector {
+	vec := make(PolyQVector, length)
+	for i := 0; i < len(vec); i++ {
+		vec[i] = poly.NewRandomPolyQWithMaxInfNorm(maxInfNorm)
+	}
+	return vec
+}
+
+func (vec PolyQVector) Power2Round(d int) (PolyQVector, PolyQVector) {
+	r1polys := make(PolyQVector, vec.Length())
+	r0polys := make(PolyQVector, vec.Length())
+
+	for i, poly := range vec {
+		p1, p0 := poly.Power2Round(d)
+
+		r1polys[i] = p1
+		r0polys[i] = p0
+	}
+
+	return r1polys, r0polys
+}
+
 func (vec PolyQVector) CoeffString() string {
 	var sb strings.Builder
 	sb.WriteString("[")

@@ -26,6 +26,31 @@ func centeredModulo(x int64, q uint64) int64 {
 	return ret
 }
 
+func decompose(r, a int64, q uint64) (int64, int64) {
+	r = int64(devkit.PositiveMod(r, q))
+	r0 := centeredModulo(r, uint64(a))
+	r1 := r - r0
+	if r1 == int64(q)-1 {
+		return int64(0), r0 - 1
+	}
+
+	r1 = int64(devkit.FloorDivision(r1, a))
+	if r != r1*a+r0 {
+		panic("r!= r1*a+r0")
+	}
+	return r1, r0
+}
+
+func highBits(r, a int64, q uint64) int64 {
+	r1, _ := decompose(r, a, q)
+	return r1
+}
+
+func lowBits(r, a int64, q uint64) int64 {
+	_, r0 := decompose(r, a, q)
+	return r0
+}
+
 func containsOnlyZeroes[V uint64 | int64](a []V) bool {
 	for _, v := range a {
 		if v != 0 {

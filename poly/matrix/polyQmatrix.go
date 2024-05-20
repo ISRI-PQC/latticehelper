@@ -151,6 +151,20 @@ func (mat PolyQMatrix) Transposed() PolyProxyMatrix {
 	return result
 }
 
+func (mat PolyQMatrix) Power2Round(d int) (PolyQMatrix, PolyQMatrix) {
+	r1vecs := make(PolyQMatrix, mat.Rows())
+	r0vecs := make(PolyQMatrix, mat.Rows())
+
+	for i, vec := range mat {
+		v1, v0 := vec.Power2Round(d)
+
+		r1vecs[i] = v1
+		r0vecs[i] = v0
+	}
+
+	return r1vecs, r0vecs
+}
+
 func (mat PolyQMatrix) ScaleByPolyProxy(inputPoly poly.PolyProxy) PolyProxyMatrix {
 	result := make(PolyQMatrix, mat.Rows())
 

@@ -8,6 +8,7 @@ import (
 type PolyProxyMatrix interface {
 	String() string
 	CoeffString() string
+	Serialize() []byte
 	Rows() int
 	Cols() int
 	Listize() []int64

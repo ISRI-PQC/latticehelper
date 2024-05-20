@@ -5,6 +5,7 @@ import "cyber.ee/pq/devkit/poly"
 type PolyProxyVector interface {
 	String() string
 	CoeffString() string
+	Serialize() []byte
 	Length() int
 	Listize() []int64
 	ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyVector

@@ -3,6 +3,7 @@ package poly
 type PolyProxy interface {
 	String() string
 	CoeffString() string
+	Serialize() []byte
 	Listize() []int64
 	Length() int
 	Neg() PolyProxy

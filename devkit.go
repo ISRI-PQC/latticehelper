@@ -15,8 +15,8 @@ var (
 	MainUniformSampler *ring.UniformSampler
 )
 
-func InitSingle(degree int, modulus uint64) error {
-	return InitMultiple(degree, []uint64{modulus})
+func InitSingle(degree int, modulus int64) error {
+	return InitMultiple(degree, []uint64{uint64(modulus)})
 }
 
 func InitMultiple(degree int, moduli []uint64) error {

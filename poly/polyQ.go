@@ -9,6 +9,7 @@ import (
 
 	"cyber.ee/pq/devkit"
 	"github.com/tuneinsight/lattigo/v5/ring"
+	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
 
 type PolyQ struct {
@@ -47,6 +48,25 @@ func NewConstantPolyQ(constant uint64) PolyQ {
 
 func NewRandomPolyQ() PolyQ {
 	ret := devkit.MainUniformSampler.ReadNew()
+	return PolyQ{&ret}
+}
+
+func NewRandomPolyQWithMaxInfNorm(maxInfNorm int) PolyQ {
+	ret := devkit.MainRing.NewPoly()
+
+	newCoeffs := make([]*big.Int, devkit.MainRing.N())
+
+	for i := range newCoeffs {
+		c := sampling.RandInt(big.NewInt(int64(maxInfNorm)))
+		if sampling.RandFloat64(0.5, 1.0) > 0.5 {
+			c = c.Neg(c)
+		}
+
+		newCoeffs[i] = c
+	}
+
+	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret)
+
 	return PolyQ{&ret}
 }
 
@@ -129,6 +149,33 @@ func (poly PolyQ) Listize() []int64 {
 		ret[i] = int64(poly.Poly.Coeffs[0][i])
 	}
 	return ret
+}
+
+func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
+	r1coeffs := make([]int64, poly.Length())
+	r0coeffs := make([]int64, poly.Length())
+
+	for i, coeff := range poly.Coeffs[0] {
+		centered := centeredModulo(int64(coeff), devkit.MainRing.Modulus().Uint64())
+
+		r1coeffs[i] = int64(devkit.FloorDivision((int64(coeff) - centered), int64(2^d)))
+		r0coeffs[i] = centered
+	}
+
+	ret1 := NewPolyQFromCoeffs(r1coeffs...)
+	ret0 := NewPolyQFromCoeffs(r0coeffs...)
+
+	return ret1, ret0
+}
+
+func (poly PolyQ) HighBits(alpha int64) PolyQ {
+	ret := poly.CopyNew()
+
+	for i, coeff := range poly.Coeffs[0] {
+		ret.Coeffs[0][i] = uint64(highBits(int64(coeff), alpha, devkit.MainRing.Modulus().Uint64()))
+	}
+
+	return PolyQ{ret}
 }
 
 func (poly PolyQ) Neg() PolyProxy {
