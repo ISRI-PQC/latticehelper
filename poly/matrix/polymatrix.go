@@ -108,18 +108,21 @@ func (mat PolyMatrix) Listize() []int64 {
 	return listizedVec
 }
 
-// func (mat PolyMatrix) InfiniteNorm() uint64 {
-
-// 	max := uint64(0)
-// 	for _, polyQVec := range mat {
-// 		maxVec := polyQVec.InfiniteNorm()
-// 		if maxVec > max {
-// 			max = maxVec
-// 		}
-// 	}
-
-// 	return max
-// }
+func (mat PolyMatrix) CheckNormBound(bound int64) bool {
+	for _, vec := range mat {
+		if vec.CheckNormBound(bound) {
+			return true
+		}
+	}
+	return false
+}
+func (mat PolyMatrix) LowBits(alpha int64) PolyMatrix {
+	newVec := make(PolyMatrix, mat.Rows())
+	for i := 0; i < mat.Rows(); i++ {
+		newVec[i] = mat[i].LowBits(alpha)
+	}
+	return newVec
+}
 
 func (mat PolyMatrix) Transposed() PolyProxyMatrix {
 	cols := mat.Cols()

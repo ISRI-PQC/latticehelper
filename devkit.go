@@ -15,12 +15,12 @@ var (
 	MainUniformSampler *ring.UniformSampler
 )
 
-func InitSingle(degree int, modulus int64) error {
-	return InitMultiple(degree, []uint64{uint64(modulus)})
+func InitSingle(degree int64, modulus uint64) error {
+	return InitMultiple(degree, []uint64{modulus})
 }
 
-func InitMultiple(degree int, moduli []uint64) error {
-	r, err := ring.NewRing(degree, moduli)
+func InitMultiple(degree int64, moduli []uint64) error {
+	r, err := ring.NewRing(int(degree), moduli)
 
 	if err != nil {
 		return err

@@ -67,7 +67,7 @@ func (coeffs Poly) CoeffString() string {
 func (coeffs Poly) String() string {
 	ret := make([]string, 0, len(coeffs))
 
-	if containsOnlyZeroes[int64](coeffs) {
+	if containsOnlyZeroes(coeffs) {
 		return "0"
 	}
 
@@ -103,6 +103,37 @@ func (coeffs Poly) TransformedToPolyQ() PolyQ {
 	}
 
 	devkit.MainRing.SetCoefficientsBigint(newCoeffs, *ret.Poly)
+
+	return ret
+}
+
+func (coeffs *Poly) ApplyToEveryCoeff(f func(int64) any) {
+	for i, coeff := range *coeffs {
+		c := f(coeff)
+		switch t := c.(type) {
+		case uint64:
+			(*coeffs)[i] = int64(t)
+		case int64:
+			(*coeffs)[i] = t
+		}
+	}
+}
+
+func (poly Poly) CheckNormBound(bound int64) bool {
+	for _, coeff := range poly {
+		if checkNormBound(coeff, bound, devkit.MainRing.Modulus().Int64()) {
+			return true
+		}
+	}
+	return false
+}
+
+func (poly Poly) LowBits(alpha int64) Poly {
+	ret := make(Poly, len(poly))
+
+	for i, coeff := range poly {
+		ret[i] = lowBits(coeff, alpha, devkit.MainRing.Modulus().Int64())
+	}
 
 	return ret
 }
@@ -167,7 +198,7 @@ func (coeffs Poly) Mul(inputPolyProxy PolyProxy) PolyProxy {
 	}
 }
 
-func (poly Poly) Pow(exp int) PolyProxy {
+func (poly Poly) Pow(exp int64) PolyProxy {
 	if exp < 0 {
 		log.Panic("Pow: Negative powers are not supported for elements of a PolyQ")
 	}
@@ -180,7 +211,7 @@ func (poly Poly) Pow(exp int) PolyProxy {
 		}
 
 		poly = poly.Mul(poly).(Poly)
-		exp = int(devkit.FloorDivision(exp, 2))
+		exp = devkit.FloorDivision(exp, 2)
 	}
 
 	return g

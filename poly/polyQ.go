@@ -39,26 +39,32 @@ func NewPolyQ() PolyQ {
 	return PolyQ{&ret}
 }
 
-func NewConstantPolyQ(constant uint64) PolyQ {
+func NewConstantPolyQ(constant int64) PolyQ {
 	ret := NewPolyQ()
-	ret.Coeffs[0][0] = constant
+
+	constant = devkit.PositiveMod(constant, devkit.MainRing.Modulus().Int64())
+
+	ret.Coeffs[devkit.MainRing.Level()][0] = uint64(constant)
 
 	return ret
 }
 
-func NewRandomPolyQ() PolyQ {
-	ret := devkit.MainUniformSampler.ReadNew()
+func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
+	if sampler == nil {
+		sampler = devkit.MainUniformSampler
+	}
+	ret := sampler.ReadNew()
 	return PolyQ{&ret}
 }
 
-func NewRandomPolyQWithMaxInfNorm(maxInfNorm int) PolyQ {
+func NewRandomPolyQWithMaxInfNorm(maxInfNorm int64) PolyQ {
 	ret := devkit.MainRing.NewPoly()
 
 	newCoeffs := make([]*big.Int, devkit.MainRing.N())
 
 	for i := range newCoeffs {
-		c := sampling.RandInt(big.NewInt(int64(maxInfNorm)))
-		if sampling.RandFloat64(0.5, 1.0) > 0.5 {
+		c := sampling.RandInt(big.NewInt(maxInfNorm))
+		if sampling.RandFloat64(0.0, 1.0) > 0.5 {
 			c = c.Neg(c)
 		}
 
@@ -92,10 +98,10 @@ func (poly PolyQ) CoeffString() string {
 }
 
 func (poly PolyQ) String() string {
-	coeffs := poly.Poly.Coeffs[0]
+	coeffs := poly.Poly.Coeffs[devkit.MainRing.Level()]
 	ret := make([]string, 0, len(coeffs)+1)
 
-	if containsOnlyZeroes[uint64](coeffs) {
+	if containsOnlyZeroes(coeffs) {
 		return "0"
 	}
 
@@ -122,10 +128,20 @@ func (poly PolyQ) String() string {
 	return strings.Join(ret, " + ")
 }
 
-func (poly PolyQ) InfiniteNorm() uint64 {
+func (coeffs PolyQ) TransformedToPoly() Poly {
+	ret := NewPoly()
+
+	for i, coeff := range coeffs.Coeffs[devkit.MainRing.Level()] {
+		ret[i] = int64(coeff)
+	}
+
+	return ret
+}
+
+func (poly PolyQ) InfiniteNorm() int64 {
 	max := int64(0)
 	for _, coeff := range poly.Listize() {
-		centeredCoeff := centeredModulo(int64(coeff), devkit.MainRing.Modulus().Uint64())
+		centeredCoeff := CenteredModulo(int64(coeff), devkit.MainRing.Modulus().Int64())
 
 		// We need absolute value
 		if centeredCoeff < 0 {
@@ -136,7 +152,7 @@ func (poly PolyQ) InfiniteNorm() uint64 {
 			max = centeredCoeff
 		}
 	}
-	return uint64(max)
+	return max
 }
 
 func (poly PolyQ) Length() int {
@@ -144,21 +160,39 @@ func (poly PolyQ) Length() int {
 }
 
 func (poly PolyQ) Listize() []int64 {
-	ret := make([]int64, len(poly.Poly.Coeffs[0]))
+	ret := make([]int64, len(poly.Poly.Coeffs[devkit.MainRing.Level()]))
 	for i := 0; i < len(ret); i++ {
-		ret[i] = int64(poly.Poly.Coeffs[0][i])
+		ret[i] = int64(poly.Poly.Coeffs[devkit.MainRing.Level()][i])
 	}
 	return ret
+}
+
+func (poly *PolyQ) ApplyToEveryCoeff(f func(uint64) any) {
+	newCoeffs := make([]*big.Int, poly.Length())
+
+	for i := 0; i < poly.Length(); i++ {
+		c := f(poly.Coeffs[devkit.MainRing.Level()][i])
+		switch t := c.(type) {
+		case int64:
+			newCoeffs[i] = new(big.Int).SetInt64(t)
+		case uint64:
+			newCoeffs[i] = new(big.Int).SetUint64(t)
+		default:
+			panic("unexpected type")
+		}
+	}
+
+	devkit.MainRing.SetCoefficientsBigint(newCoeffs, *poly.Poly)
 }
 
 func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
 	r1coeffs := make([]int64, poly.Length())
 	r0coeffs := make([]int64, poly.Length())
 
-	for i, coeff := range poly.Coeffs[0] {
-		centered := centeredModulo(int64(coeff), devkit.MainRing.Modulus().Uint64())
+	for i, coeff := range poly.Coeffs[devkit.MainRing.Level()] {
+		centered := CenteredModulo(int64(coeff), devkit.MainRing.Modulus().Int64())
 
-		r1coeffs[i] = int64(devkit.FloorDivision((int64(coeff) - centered), int64(2^d)))
+		r1coeffs[i] = devkit.FloorDivision(int64(coeff)-centered, 2^d)
 		r0coeffs[i] = centered
 	}
 
@@ -171,8 +205,8 @@ func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
 func (poly PolyQ) HighBits(alpha int64) PolyQ {
 	ret := poly.CopyNew()
 
-	for i, coeff := range poly.Coeffs[0] {
-		ret.Coeffs[0][i] = uint64(highBits(int64(coeff), alpha, devkit.MainRing.Modulus().Uint64()))
+	for i, coeff := range poly.Coeffs[devkit.MainRing.Level()] {
+		ret.Coeffs[devkit.MainRing.Level()][i] = uint64(highBits(int64(coeff), alpha, devkit.MainRing.Modulus().Int64()))
 	}
 
 	return PolyQ{ret}
@@ -240,7 +274,7 @@ func (poly PolyQ) Mul(inputPolyProxy PolyProxy) PolyProxy {
 	return retPoly
 }
 
-func (poly PolyQ) Pow(exp int) PolyProxy {
+func (poly PolyQ) Pow(exp int64) PolyProxy {
 	if exp < 0 {
 		log.Panic("Pow: Negative powers are not supported for elements of a PolyQ")
 	}
@@ -253,7 +287,7 @@ func (poly PolyQ) Pow(exp int) PolyProxy {
 		}
 
 		poly = poly.Mul(PolyQ{poly.CopyNew()}).(PolyQ)
-		exp = int(devkit.FloorDivision(exp, 2))
+		exp = devkit.FloorDivision(exp, 2)
 	}
 
 	return g
@@ -262,9 +296,9 @@ func (poly PolyQ) Pow(exp int) PolyProxy {
 func (poly PolyQ) ScaleByInt(scalar int64) PolyProxy {
 	retPoly := NewPolyQ()
 
-	sc := devkit.PositiveMod(scalar, devkit.MainRing.Modulus().Uint64())
+	sc := devkit.PositiveMod(scalar, devkit.MainRing.Modulus().Int64())
 
-	devkit.MainRing.MulScalar(*poly.Poly, sc, *retPoly.Poly)
+	devkit.MainRing.MulScalar(*poly.Poly, uint64(sc), *retPoly.Poly)
 
 	return retPoly
 }
@@ -272,7 +306,7 @@ func (poly PolyQ) ScaleByInt(scalar int64) PolyProxy {
 func (poly PolyQ) AddToFirstCoeff(input int64) PolyProxy {
 	retPoly := poly.CopyNew()
 
-	inputQ := devkit.PositiveMod(input, devkit.MainRing.Modulus().Uint64())
+	inputQ := devkit.PositiveMod(input, devkit.MainRing.Modulus().Int64())
 
 	addPoly := NewConstantPolyQ(inputQ)
 

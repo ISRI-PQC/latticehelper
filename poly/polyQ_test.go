@@ -5,7 +5,7 @@ import (
 )
 
 func TestPolyQSerialize(t *testing.T) {
-	p := NewRandomPolyQ()
+	p := NewRandomPolyQ(nil)
 	b := p.Serialize()
 
 	n := DeserializePolyQ(b)

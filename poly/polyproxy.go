@@ -11,7 +11,7 @@ type PolyProxy interface {
 	Add(inputPolyProxy PolyProxy) PolyProxy
 	Sub(inputPolyProxy PolyProxy) PolyProxy
 	Mul(inputPolyProxy PolyProxy) PolyProxy
-	Pow(exp int) PolyProxy
+	Pow(exp int64) PolyProxy
 	ScaleByInt(scalar int64) PolyProxy
 	AddToFirstCoeff(input int64) PolyProxy
 	Equals(other PolyProxy) bool

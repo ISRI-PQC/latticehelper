@@ -8,7 +8,7 @@ import (
 // Used to get polynomial matrices to integer matrices while
 // preserving the structure
 func toeplitz(input poly.PolyQ) [][]int64 {
-	flist := input.Poly.Coeffs[0]
+	flist := input.Poly.Coeffs[devkit.MainRing.Level()]
 	F := make([][]int64, len(flist))
 	for i := 0; i < len(flist); i++ {
 		F[i] = make([]int64, len(flist))
@@ -43,7 +43,11 @@ func BigToeplitz(A PolyQMatrix, m, n int) [][]int64 {
 	for row := 0; row < m*devkit.MainRing.N(); row++ {
 		result[row] = make([]int64, n*devkit.MainRing.N())
 		for col := 0; col < n*devkit.MainRing.N(); col++ {
-			result[row][col] = source[devkit.FloorDivision(row, devkit.MainRing.N())][devkit.FloorDivision(col, devkit.MainRing.N())][row%devkit.MainRing.N()][col%devkit.MainRing.N()]
+			result[row][col] = source[devkit.FloorDivision(
+				int64(row), int64(devkit.MainRing.N()),
+			)][devkit.FloorDivision(
+				int64(col), int64(devkit.MainRing.N()),
+			)][row%devkit.MainRing.N()][col%devkit.MainRing.N()]
 		}
 	}
 

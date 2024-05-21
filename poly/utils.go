@@ -6,47 +6,43 @@ import (
 	"cyber.ee/pq/devkit"
 )
 
-/*
-	Returns x mod q, but centered around 0
-
-Args:
-
-	x (int): number to be modded
-	q (int): modulus
-
-Returns:
-
-	int: x mod q, centered around 0
-*/
-func centeredModulo(x int64, q uint64) int64 {
-	ret := int64(devkit.PositiveMod(x, q))
-	if ret > (int64(q) >> 1) {
-		ret -= int64(q)
+func CenteredModulo(x, q int64) int64 {
+	ret := devkit.PositiveMod(x, q)
+	if ret > (q >> 1) {
+		ret -= q
 	}
 	return ret
 }
 
-func decompose(r, a int64, q uint64) (int64, int64) {
-	r = int64(devkit.PositiveMod(r, q))
-	r0 := centeredModulo(r, uint64(a))
+func checkNormBound(n, b, q int64) bool {
+	x := n % q
+	x = ((q - 1) >> 1) - x
+	x = x ^ (x >> 31)
+	x = ((q - 1) >> 1) - x
+	return x >= b
+}
+
+func decompose(r, a, q int64) (int64, int64) {
+	r = devkit.PositiveMod(r, q)
+	r0 := CenteredModulo(r, a)
 	r1 := r - r0
-	if r1 == int64(q)-1 {
-		return int64(0), r0 - 1
+	if r1 == q-1 {
+		return 0, r0 - 1
 	}
 
-	r1 = int64(devkit.FloorDivision(r1, a))
+	r1 = devkit.FloorDivision(r1, a)
 	if r != r1*a+r0 {
 		panic("r!= r1*a+r0")
 	}
 	return r1, r0
 }
 
-func highBits(r, a int64, q uint64) int64 {
+func highBits(r, a, q int64) int64 {
 	r1, _ := decompose(r, a, q)
 	return r1
 }
 
-func lowBits(r, a int64, q uint64) int64 {
+func lowBits(r, a, q int64) int64 {
 	_, r0 := decompose(r, a, q)
 	return r0
 }

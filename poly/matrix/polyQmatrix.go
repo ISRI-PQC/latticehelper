@@ -10,6 +10,7 @@ import (
 	"cyber.ee/pq/devkit/poly"
 	"cyber.ee/pq/devkit/poly/vector"
 	"github.com/raszia/gotiny"
+	"github.com/tuneinsight/lattigo/v5/ring"
 )
 
 type PolyQMatrix []vector.PolyQVector
@@ -55,8 +56,16 @@ func NewPolyQMatrixFromCoeffs(coeffMat [][][]int64) PolyQMatrix {
 
 func NewRandomPolyQMatrix(rows, cols int) PolyQMatrix {
 	newMatrix := make(PolyQMatrix, rows)
-	for i := 0; i < rows; i++ {
+	for i := 0; i < int(rows); i++ {
 		newMatrix[i] = vector.NewRandomPolyQVector(cols)
+	}
+	return PolyQMatrix(newMatrix)
+}
+
+func NewRandomPolyQMatrixWithSampler(sampler *ring.UniformSampler, rows, cols int) PolyQMatrix {
+	newMatrix := make(PolyQMatrix, rows)
+	for i := 0; i < rows; i++ {
+		newMatrix[i] = vector.NewRandomPolyQVectorWithSampler(sampler, cols)
 	}
 	return PolyQMatrix(newMatrix)
 }
@@ -64,7 +73,7 @@ func NewRandomPolyQMatrix(rows, cols int) PolyQMatrix {
 func NewIdentityPolyQMatrix(size int) PolyQMatrix {
 	newMatrix := NewZeroPolyQMatrix(size, size)
 	for i := 0; i < size; i++ {
-		newMatrix[i][i].Poly.Coeffs[0][0] = uint64(1)
+		newMatrix[i][i].Poly.Coeffs[devkit.MainRing.Level()][0] = uint64(1)
 	}
 	return newMatrix
 }
@@ -102,6 +111,14 @@ func (mat PolyQMatrix) String() string {
 	return sb.String()
 }
 
+func (mat PolyQMatrix) TransformedToPolyMatrix() PolyMatrix {
+	polyMatrix := make(PolyMatrix, mat.Rows())
+	for i, polyQVector := range mat {
+		polyMatrix[i] = polyQVector.TransformedToPolyVector()
+	}
+	return polyMatrix
+}
+
 func (mat PolyQMatrix) Rows() int {
 	return len(mat)
 }
@@ -120,8 +137,8 @@ func (mat PolyQMatrix) Listize() []int64 {
 	return listizedVec
 }
 
-func (mat PolyQMatrix) InfiniteNorm() uint64 {
-	max := uint64(0)
+func (mat PolyQMatrix) InfiniteNorm() int64 {
+	max := int64(0)
 	for _, polyQVec := range mat {
 		maxVec := polyQVec.InfiniteNorm()
 		if maxVec > max {
@@ -151,7 +168,7 @@ func (mat PolyQMatrix) Transposed() PolyProxyMatrix {
 	return result
 }
 
-func (mat PolyQMatrix) Power2Round(d int) (PolyQMatrix, PolyQMatrix) {
+func (mat PolyQMatrix) Power2Round(d int64) (PolyQMatrix, PolyQMatrix) {
 	r1vecs := make(PolyQMatrix, mat.Rows())
 	r0vecs := make(PolyQMatrix, mat.Rows())
 
@@ -163,6 +180,14 @@ func (mat PolyQMatrix) Power2Round(d int) (PolyQMatrix, PolyQMatrix) {
 	}
 
 	return r1vecs, r0vecs
+}
+
+func (mat PolyQMatrix) HighBits(alpha int64) PolyQMatrix {
+	newVec := make(PolyQMatrix, mat.Rows())
+	for i := 0; i < mat.Rows(); i++ {
+		newVec[i] = mat[i].HighBits(alpha)
+	}
+	return newVec
 }
 
 func (mat PolyQMatrix) ScaleByPolyProxy(inputPoly poly.PolyProxy) PolyProxyMatrix {

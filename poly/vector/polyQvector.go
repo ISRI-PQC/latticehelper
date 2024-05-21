@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/binary"
 	"log"
+	"math"
 	"strings"
 
 	"cyber.ee/pq/devkit"
 	"cyber.ee/pq/devkit/poly"
 	"github.com/raszia/gotiny"
+	"github.com/tuneinsight/lattigo/v5/ring"
 )
 
 type PolyQVector []poly.PolyQ
@@ -58,12 +60,20 @@ func NewZeroPolyQVector(length int) PolyQVector {
 func NewRandomPolyQVector(length int) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
-		vec[i] = poly.NewRandomPolyQ()
+		vec[i] = poly.NewRandomPolyQ(nil)
 	}
 	return vec
 }
 
-func NewRandomPolyQVectorWithMaxInfNorm(length int, maxInfNorm int) PolyQVector {
+func NewRandomPolyQVectorWithSampler(sampler *ring.UniformSampler, length int) PolyQVector {
+	vec := make(PolyQVector, length)
+	for i := 0; i < len(vec); i++ {
+		vec[i] = poly.NewRandomPolyQ(sampler)
+	}
+	return vec
+}
+
+func NewRandomPolyQVectorWithMaxInfNorm(length int, maxInfNorm int64) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
 		vec[i] = poly.NewRandomPolyQWithMaxInfNorm(maxInfNorm)
@@ -71,7 +81,7 @@ func NewRandomPolyQVectorWithMaxInfNorm(length int, maxInfNorm int) PolyQVector 
 	return vec
 }
 
-func (vec PolyQVector) Power2Round(d int) (PolyQVector, PolyQVector) {
+func (vec PolyQVector) Power2Round(d int64) (PolyQVector, PolyQVector) {
 	r1polys := make(PolyQVector, vec.Length())
 	r0polys := make(PolyQVector, vec.Length())
 
@@ -83,6 +93,20 @@ func (vec PolyQVector) Power2Round(d int) (PolyQVector, PolyQVector) {
 	}
 
 	return r1polys, r0polys
+}
+
+func (vec *PolyQVector) ApplyToEveryCoeff(f func(uint64) any) {
+	for _, poly := range *vec {
+		poly.ApplyToEveryCoeff(f)
+	}
+}
+
+func (vec PolyQVector) HighBits(alpha int64) PolyQVector {
+	newVec := make(PolyQVector, len(vec))
+	for i := 0; i < len(newVec); i++ {
+		newVec[i] = vec[i].HighBits(alpha)
+	}
+	return newVec
 }
 
 func (vec PolyQVector) CoeffString() string {
@@ -111,6 +135,14 @@ func (vec PolyQVector) String() string {
 	return sb.String()
 }
 
+func (vec PolyQVector) TransformedToPolyVector() PolyVector {
+	ret := make(PolyVector, vec.Length())
+	for i, currentPoly := range vec {
+		ret[i] = currentPoly.TransformedToPoly()
+	}
+	return ret
+}
+
 func (vec PolyQVector) Length() int {
 	return len(vec)
 }
@@ -123,8 +155,8 @@ func (vec PolyQVector) Listize() []int64 {
 	return listizedVec
 }
 
-func (vec PolyQVector) InfiniteNorm() uint64 {
-	max := uint64(0)
+func (vec PolyQVector) InfiniteNorm() int64 {
+	max := int64(0)
 	for _, currentPoly := range vec {
 		maxPoly := currentPoly.InfiniteNorm()
 		if maxPoly > max {
@@ -132,6 +164,14 @@ func (vec PolyQVector) InfiniteNorm() uint64 {
 		}
 	}
 	return max
+}
+
+func (vec PolyQVector) SecondNorm() float64 {
+	sum := int64(0)
+	for _, currentPoly := range vec {
+		sum += currentPoly.InfiniteNorm() ^ 2
+	}
+	return math.Sqrt(float64(sum))
 }
 
 func (vec PolyQVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyVector {

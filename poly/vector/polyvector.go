@@ -82,6 +82,12 @@ func (vec PolyVector) TransformedToPolyQVector() PolyQVector {
 	return ret
 }
 
+func (vec *PolyVector) ApplyToEveryCoeff(f func(int64) any) {
+	for _, poly := range *vec {
+		poly.ApplyToEveryCoeff(f)
+	}
+}
+
 func (vec PolyVector) Length() int {
 	return len(vec)
 }
@@ -94,16 +100,22 @@ func (vec PolyVector) Listize() []int64 {
 	return listizedVec
 }
 
-// func (vec PolyVector) InfiniteNorm() uint64 {
-// 	max := uint64(0)
-// 	for _, poly := range vec {
-// 		maxPoly := poly.InfiniteNorm()
-// 		if maxPoly > max {
-// 			max = maxPoly
-// 		}
-// 	}
-// 	return max
-// }
+func (vec PolyVector) CheckNormBound(bound int64) bool {
+	for _, poly := range vec {
+		if poly.CheckNormBound(bound) {
+			return true
+		}
+	}
+	return false
+}
+
+func (vec PolyVector) LowBits(alpha int64) PolyVector {
+	newVec := make(PolyVector, len(vec))
+	for i := 0; i < len(newVec); i++ {
+		newVec[i] = vec[i].LowBits(alpha)
+	}
+	return newVec
+}
 
 func (vec PolyVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyVector {
 	switch input := inputPolyProxy.(type) {
