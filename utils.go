@@ -27,6 +27,11 @@ func PowMod(a, b, m int64) int64 {
 	return ret
 }
 
+func Pow(a, b int64) int64 {
+	ret := new(big.Int).Exp(big.NewInt(a), big.NewInt(b), nil).Int64()
+	return ret
+}
+
 func PositiveMod(a, m int64) int64 {
 	ret := a % m
 	if ret < 0 {

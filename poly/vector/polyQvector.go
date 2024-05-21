@@ -169,7 +169,7 @@ func (vec PolyQVector) InfiniteNorm() int64 {
 func (vec PolyQVector) SecondNorm() float64 {
 	sum := int64(0)
 	for _, currentPoly := range vec {
-		sum += currentPoly.InfiniteNorm() ^ 2
+		sum += devkit.Pow(currentPoly.InfiniteNorm(), 2)
 	}
 	return math.Sqrt(float64(sum))
 }

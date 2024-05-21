@@ -15,7 +15,7 @@ func CenteredModulo(x, q int64) int64 {
 }
 
 func checkNormBound(n, b, q int64) bool {
-	x := n % q
+	x := devkit.PositiveMod(n, q)
 	x = ((q - 1) >> 1) - x
 	x = x ^ (x >> 31)
 	x = ((q - 1) >> 1) - x

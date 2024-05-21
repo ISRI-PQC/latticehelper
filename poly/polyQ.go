@@ -190,9 +190,9 @@ func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
 	r0coeffs := make([]int64, poly.Length())
 
 	for i, coeff := range poly.Coeffs[devkit.MainRing.Level()] {
-		centered := CenteredModulo(int64(coeff), devkit.MainRing.Modulus().Int64())
+		centered := CenteredModulo(int64(coeff), devkit.Pow(2, d))
 
-		r1coeffs[i] = devkit.FloorDivision(int64(coeff)-centered, 2^d)
+		r1coeffs[i] = devkit.FloorDivision(int64(coeff)-centered, devkit.Pow(2, d))
 		r0coeffs[i] = centered
 	}
 
