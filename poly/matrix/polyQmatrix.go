@@ -315,6 +315,7 @@ func (mat PolyQMatrix) MatMul(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix
 	inputTransposed := inputPolyQMatrix.Transposed().(PolyQMatrix)
 
 	newMat := make(PolyQMatrix, rows)
+	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
 
 	for i := 0; i < rows; i++ {
 		currentVec := make(vector.PolyQVector, otherCols)
@@ -323,19 +324,19 @@ func (mat PolyQMatrix) MatMul(inputPolyProxyMat PolyProxyMatrix) PolyProxyMatrix
 			currentPoly := poly.NewPolyQ()
 
 			for k := 0; k < cols; k++ {
-				devkit.MainRing.NTT(*mat[i][k].Poly, *mat[i][k].Poly)
-				devkit.MainRing.NTT(*inputTransposed[k][j].Poly, *inputTransposed[k][j].Poly)
+				matNTT := r.NewPoly()
+				inputNTT := r.NewPoly()
 
-				devkit.MainRing.MulCoeffsBarrettThenAdd(
-					*mat[i][k].Poly,
-					*inputTransposed[k][j].Poly,
-					*currentPoly.Poly)
+				r.NTT(mat[i][k].Poly, matNTT)
+				r.NTT(inputTransposed[k][j].Poly, inputNTT)
 
-				devkit.MainRing.INTT(*mat[i][k].Poly, *mat[i][k].Poly)
-				devkit.MainRing.INTT(*inputTransposed[k][j].Poly, *inputTransposed[k][j].Poly)
+				r.MulCoeffsBarrettThenAdd(
+					matNTT,
+					inputNTT,
+					currentPoly.Poly)
 			}
 
-			devkit.MainRing.INTT(*currentPoly.Poly, *currentPoly.Poly)
+			r.INTT(currentPoly.Poly, currentPoly.Poly)
 
 			currentVec[j] = currentPoly
 		}
@@ -360,19 +361,20 @@ func (mat PolyQMatrix) VecMul(inputPolyProxyVector vector.PolyProxyVector) vecto
 
 	newVec := make(vector.PolyQVector, mat.Rows())
 
+	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
 	for i := 0; i < mat.Rows(); i++ {
 		currentPoly := poly.NewPolyQ()
 
 		for j := 0; j < inputPolyProxyVector.Length(); j++ {
-			devkit.MainRing.NTT(*inputPolyQVector[j].Poly, *inputPolyQVector[j].Poly)
-			devkit.MainRing.NTT(*mat[i][j].Poly, *mat[i][j].Poly)
+			matNTT := r.NewPoly()
+			inputNTT := r.NewPoly()
 
-			devkit.MainRing.MulCoeffsBarrettThenAdd(*inputPolyQVector[j].Poly, *mat[i][j].Poly, *currentPoly.Poly)
+			r.NTT(inputPolyQVector[j].Poly, inputNTT)
+			r.NTT(mat[i][j].Poly, matNTT)
 
-			devkit.MainRing.INTT(*inputPolyQVector[j].Poly, *inputPolyQVector[j].Poly)
-			devkit.MainRing.INTT(*mat[i][j].Poly, *mat[i][j].Poly)
+			r.MulCoeffsBarrettThenAdd(inputNTT, matNTT, currentPoly.Poly)
 		}
-		devkit.MainRing.INTT(*currentPoly.Poly, *currentPoly.Poly)
+		r.INTT(currentPoly.Poly, currentPoly.Poly)
 
 		newVec[i] = currentPoly
 	}

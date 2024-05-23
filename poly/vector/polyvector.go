@@ -82,10 +82,20 @@ func (vec PolyVector) TransformedToPolyQVector() PolyQVector {
 	return ret
 }
 
-func (vec *PolyVector) ApplyToEveryCoeff(f func(int64) any) {
+func (vec PolyVector) WithCenteredModulo() PolyVector {
+	ret := make(PolyVector, vec.Length())
+	for i, currentPoly := range vec {
+		ret[i] = currentPoly.WithCenteredModulo()
+	}
+	return ret
+}
+
+func (vec *PolyVector) ApplyToEveryCoeff(f func(int64) any) *PolyVector {
 	for _, poly := range *vec {
 		poly.ApplyToEveryCoeff(f)
 	}
+
+	return vec
 }
 
 func (vec PolyVector) Length() int {
@@ -241,17 +251,18 @@ func (vec PolyVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.Poly
 		currentPolyQVector := vec.TransformedToPolyQVector()
 
 		newPoly := poly.NewPolyQ()
+		r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
 
 		for i := 0; i < vec.Length(); i++ {
-			devkit.MainRing.NTT(*currentPolyQVector[i].Poly, *currentPolyQVector[i].Poly)
-			devkit.MainRing.NTT(*input[i].Poly, *input[i].Poly)
+			vecNTT := r.NewPoly()
+			inputNTT := r.NewPoly()
 
-			devkit.MainRing.MulCoeffsBarrettThenAdd(*currentPolyQVector[i].Poly, *input[i].Poly, *newPoly.Poly)
+			r.NTT(currentPolyQVector[i].Poly, vecNTT)
+			r.NTT(input[i].Poly, inputNTT)
 
-			devkit.MainRing.INTT(*currentPolyQVector[i].Poly, *currentPolyQVector[i].Poly)
-			devkit.MainRing.INTT(*input[i].Poly, *input[i].Poly)
+			r.MulCoeffsBarrettThenAdd(vecNTT, inputNTT, newPoly.Poly)
 		}
-		devkit.MainRing.INTT(*newPoly.Poly, *newPoly.Poly)
+		r.INTT(newPoly.Poly, newPoly.Poly)
 		return newPoly
 	default:
 		log.Panic("Invalid PolyProxyVector.")

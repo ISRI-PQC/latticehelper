@@ -102,8 +102,16 @@ func (coeffs Poly) TransformedToPolyQ() PolyQ {
 		newCoeffs[i] = big.NewInt(coeff)
 	}
 
-	devkit.MainRing.SetCoefficientsBigint(newCoeffs, *ret.Poly)
+	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret.Poly)
 
+	return ret
+}
+
+func (coeffs Poly) WithCenteredModulo() Poly {
+	ret := make([]int64, len(coeffs))
+	for i, coeff := range coeffs {
+		ret[i] = CenteredModulo(coeff, devkit.MainRing.Modulus().Int64())
+	}
 	return ret
 }
 

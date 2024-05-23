@@ -13,7 +13,7 @@ import (
 )
 
 type PolyQ struct {
-	*ring.Poly
+	ring.Poly
 }
 
 func NewPolyQFromCoeffs(coeffs ...int64) PolyQ {
@@ -31,12 +31,12 @@ func NewPolyQFromCoeffs(coeffs ...int64) PolyQ {
 
 	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret)
 
-	return PolyQ{&ret}
+	return PolyQ{ret}
 }
 
 func NewPolyQ() PolyQ {
 	ret := devkit.MainRing.NewPoly()
-	return PolyQ{&ret}
+	return PolyQ{ret}
 }
 
 func NewConstantPolyQ(constant int64) PolyQ {
@@ -54,7 +54,7 @@ func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
 		sampler = devkit.MainUniformSampler
 	}
 	ret := sampler.ReadNew()
-	return PolyQ{&ret}
+	return PolyQ{ret}
 }
 
 func NewRandomPolyQWithMaxInfNorm(maxInfNorm int64) PolyQ {
@@ -63,7 +63,7 @@ func NewRandomPolyQWithMaxInfNorm(maxInfNorm int64) PolyQ {
 	newCoeffs := make([]*big.Int, devkit.MainRing.N())
 
 	for i := range newCoeffs {
-		c := sampling.RandInt(big.NewInt(maxInfNorm))
+		c := sampling.RandInt(big.NewInt(maxInfNorm + 1))
 		if sampling.RandFloat64(0.0, 1.0) > 0.5 {
 			c = c.Neg(c)
 		}
@@ -73,7 +73,7 @@ func NewRandomPolyQWithMaxInfNorm(maxInfNorm int64) PolyQ {
 
 	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret)
 
-	return PolyQ{&ret}
+	return PolyQ{ret}
 }
 
 func (poly PolyQ) Serialize() []byte {
@@ -167,7 +167,7 @@ func (poly PolyQ) Listize() []int64 {
 	return ret
 }
 
-func (poly *PolyQ) ApplyToEveryCoeff(f func(uint64) any) {
+func (poly PolyQ) ApplyToEveryCoeff(f func(uint64) any) {
 	newCoeffs := make([]*big.Int, poly.Length())
 
 	for i := 0; i < poly.Length(); i++ {
@@ -182,7 +182,7 @@ func (poly *PolyQ) ApplyToEveryCoeff(f func(uint64) any) {
 		}
 	}
 
-	devkit.MainRing.SetCoefficientsBigint(newCoeffs, *poly.Poly)
+	devkit.MainRing.SetCoefficientsBigint(newCoeffs, poly.Poly)
 }
 
 func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
@@ -209,12 +209,12 @@ func (poly PolyQ) HighBits(alpha int64) PolyQ {
 		ret.Coeffs[devkit.MainRing.Level()][i] = uint64(highBits(int64(coeff), alpha, devkit.MainRing.Modulus().Int64()))
 	}
 
-	return PolyQ{ret}
+	return PolyQ{*ret}
 }
 
 func (poly PolyQ) Neg() PolyProxy {
 	retPoly := NewPolyQ()
-	devkit.MainRing.Neg(*poly.Poly, *retPoly.Poly)
+	devkit.MainRing.Neg(poly.Poly, retPoly.Poly)
 	return retPoly
 }
 
@@ -229,7 +229,7 @@ func (poly PolyQ) Add(inputPolyProxy PolyProxy) PolyProxy {
 	}
 
 	retPoly := NewPolyQ()
-	devkit.MainRing.Add(*poly.Poly, *inputPolyQ.Poly, *retPoly.Poly)
+	devkit.MainRing.Add(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
 
 	return retPoly
 
@@ -246,7 +246,7 @@ func (poly PolyQ) Sub(inputPolyProxy PolyProxy) PolyProxy {
 	}
 
 	retPoly := NewPolyQ()
-	devkit.MainRing.Sub(*poly.Poly, *inputPolyQ.Poly, *retPoly.Poly)
+	devkit.MainRing.Sub(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
 
 	return retPoly
 }
@@ -260,16 +260,18 @@ func (poly PolyQ) Mul(inputPolyProxy PolyProxy) PolyProxy {
 	case Poly:
 		inputPolyQ = input.TransformedToPolyQ()
 	}
+	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
 
-	devkit.MainRing.NTT(*poly.Poly, *poly.Poly)
-	devkit.MainRing.NTT(*inputPolyQ.Poly, *inputPolyQ.Poly)
+	polyNTT := r.NewPoly()
+	inputNTT := r.NewPoly()
+
+	r.NTT(poly.Poly, polyNTT)
+	r.NTT(inputPolyQ.Poly, inputNTT)
 
 	retPoly := NewPolyQ()
-	devkit.MainRing.MulCoeffsBarrett(*poly.Poly, *inputPolyQ.Poly, *retPoly.Poly)
+	r.MulCoeffsBarrett(polyNTT, inputNTT, retPoly.Poly)
 
-	devkit.MainRing.INTT(*poly.Poly, *poly.Poly)
-	devkit.MainRing.INTT(*inputPolyQ.Poly, *inputPolyQ.Poly)
-	devkit.MainRing.INTT(*retPoly.Poly, *retPoly.Poly)
+	r.INTT(retPoly.Poly, retPoly.Poly)
 
 	return retPoly
 }
@@ -286,7 +288,7 @@ func (poly PolyQ) Pow(exp int64) PolyProxy {
 			g = g.Mul(poly).(PolyQ)
 		}
 
-		poly = poly.Mul(PolyQ{poly.CopyNew()}).(PolyQ)
+		poly = poly.Mul(PolyQ{*poly.CopyNew()}).(PolyQ)
 		exp = devkit.FloorDivision(exp, 2)
 	}
 
@@ -298,19 +300,19 @@ func (poly PolyQ) ScaleByInt(scalar int64) PolyProxy {
 
 	sc := devkit.PositiveMod(scalar, devkit.MainRing.Modulus().Int64())
 
-	devkit.MainRing.MulScalar(*poly.Poly, uint64(sc), *retPoly.Poly)
+	devkit.MainRing.MulScalar(poly.Poly, uint64(sc), retPoly.Poly)
 
 	return retPoly
 }
 
 func (poly PolyQ) AddToFirstCoeff(input int64) PolyProxy {
-	retPoly := poly.CopyNew()
+	retPoly := *poly.CopyNew()
 
 	inputQ := devkit.PositiveMod(input, devkit.MainRing.Modulus().Int64())
 
 	addPoly := NewConstantPolyQ(inputQ)
 
-	devkit.MainRing.Add(*retPoly, *addPoly.Poly, *retPoly)
+	devkit.MainRing.Add(retPoly, addPoly.Poly, retPoly)
 
 	return PolyQ{retPoly}
 }
@@ -318,7 +320,7 @@ func (poly PolyQ) AddToFirstCoeff(input int64) PolyProxy {
 func (poly PolyQ) Equals(other PolyProxy) bool {
 	switch input := other.(type) {
 	case PolyQ:
-		return devkit.MainRing.Equal(*poly.Poly, *input.Poly)
+		return devkit.MainRing.Equal(poly.Poly, input.Poly)
 	default:
 		return false
 	}

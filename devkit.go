@@ -26,7 +26,7 @@ func InitMultiple(degree int64, moduli []uint64) error {
 		return err
 	}
 
-	MainRing = r.AtLevel(0)
+	MainRing = r
 
 	prng, err := sampling.NewPRNG()
 
