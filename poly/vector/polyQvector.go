@@ -269,15 +269,15 @@ func (vec PolyQVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.Pol
 	newPoly := poly.NewPolyQ()
 
 	for i := 0; i < vec.Length(); i++ {
-		devkit.MainRing.NTT(*vec[i].Poly, *vec[i].Poly)
-		devkit.MainRing.NTT(*inputPolyQVector[i].Poly, *inputPolyQVector[i].Poly)
+		devkit.MainRing.NTT(vec[i].Poly, vec[i].Poly)
+		devkit.MainRing.NTT(inputPolyQVector[i].Poly, inputPolyQVector[i].Poly)
 
-		devkit.MainRing.MulCoeffsBarrettThenAdd(*vec[i].Poly, *inputPolyQVector[i].Poly, *newPoly.Poly)
+		devkit.MainRing.MulCoeffsBarrettThenAdd(vec[i].Poly, inputPolyQVector[i].Poly, newPoly.Poly)
 
-		devkit.MainRing.INTT(*vec[i].Poly, *vec[i].Poly)
-		devkit.MainRing.INTT(*inputPolyQVector[i].Poly, *inputPolyQVector[i].Poly)
+		devkit.MainRing.INTT(vec[i].Poly, vec[i].Poly)
+		devkit.MainRing.INTT(inputPolyQVector[i].Poly, inputPolyQVector[i].Poly)
 	}
-	devkit.MainRing.INTT(*newPoly.Poly, *newPoly.Poly)
+	devkit.MainRing.INTT(newPoly.Poly, newPoly.Poly)
 
 	return newPoly
 }
