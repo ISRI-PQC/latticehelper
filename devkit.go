@@ -11,8 +11,8 @@ import (
 // [cyber.ee/pq/common.InitSingle] or
 // [cyber.ee/pq/common.InitMultiple] functions!
 var (
-	MainRing           *ring.Ring
-	MainUniformSampler *ring.UniformSampler
+	MainRing              *ring.Ring
+	DefaultUniformSampler *ring.UniformSampler
 )
 
 func InitSingle(degree int64, modulus uint64) error {
@@ -28,15 +28,25 @@ func InitMultiple(degree int64, moduli []uint64) error {
 
 	MainRing = r
 
-	prng, err := sampling.NewPRNG()
+	s, err := GetSampler()
 
 	if err != nil {
 		return err
 	}
 
-	us := ring.NewUniformSampler(prng, r)
-
-	MainUniformSampler = us
+	DefaultUniformSampler = s
 
 	return nil
+}
+
+func GetSampler() (*ring.UniformSampler, error) {
+	prng, err := sampling.NewPRNG()
+
+	if err != nil {
+		return nil, err
+	}
+
+	us := ring.NewUniformSampler(prng, MainRing.AtLevel(MainRing.Level()))
+
+	return us, nil
 }

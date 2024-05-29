@@ -22,7 +22,7 @@ func TestPolyMatrixSerialize(t *testing.T) {
 	}
 }
 func TestPolyQMatrixSerialize(t *testing.T) {
-	p := NewRandomPolyQMatrix(5, 25)
+	p := NewRandomPolyQMatrix(devkit.DefaultUniformSampler, 5, 25)
 	b := p.Serialize()
 
 	n := DeserializePolyQMatrix(b)

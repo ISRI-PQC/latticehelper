@@ -57,15 +57,8 @@ func NewZeroPolyQVector(length int) PolyQVector {
 	return vec
 }
 
-func NewRandomPolyQVector(length int) PolyQVector {
-	vec := make(PolyQVector, length)
-	for i := 0; i < len(vec); i++ {
-		vec[i] = poly.NewRandomPolyQ(nil)
-	}
-	return vec
-}
-
-func NewRandomPolyQVectorWithSampler(sampler *ring.UniformSampler, length int) PolyQVector {
+// Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+func NewRandomPolyQVector(sampler *ring.UniformSampler, length int) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
 		vec[i] = poly.NewRandomPolyQ(sampler)

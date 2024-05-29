@@ -49,10 +49,8 @@ func NewConstantPolyQ(constant int64) PolyQ {
 	return ret
 }
 
+// Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
 func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
-	if sampler == nil {
-		sampler = devkit.MainUniformSampler
-	}
 	ret := sampler.ReadNew()
 	return PolyQ{ret}
 }

@@ -23,7 +23,7 @@ func TestPolyVectorSerialize(t *testing.T) {
 	}
 }
 func TestPolyQVectorSerialize(t *testing.T) {
-	p := NewRandomPolyQVector(5)
+	p := NewRandomPolyQVector(devkit.DefaultUniformSampler, 5)
 	b := p.Serialize()
 
 	n := DeserializePolyQVector(b)

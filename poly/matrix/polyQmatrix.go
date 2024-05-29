@@ -54,18 +54,11 @@ func NewPolyQMatrixFromCoeffs(coeffMat [][][]int64) PolyQMatrix {
 	return PolyQMatrix(newMatrix)
 }
 
-func NewRandomPolyQMatrix(rows, cols int) PolyQMatrix {
-	newMatrix := make(PolyQMatrix, rows)
-	for i := 0; i < int(rows); i++ {
-		newMatrix[i] = vector.NewRandomPolyQVector(cols)
-	}
-	return PolyQMatrix(newMatrix)
-}
-
-func NewRandomPolyQMatrixWithSampler(sampler *ring.UniformSampler, rows, cols int) PolyQMatrix {
+// Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+func NewRandomPolyQMatrix(sampler *ring.UniformSampler, rows, cols int) PolyQMatrix {
 	newMatrix := make(PolyQMatrix, rows)
 	for i := 0; i < rows; i++ {
-		newMatrix[i] = vector.NewRandomPolyQVectorWithSampler(sampler, cols)
+		newMatrix[i] = vector.NewRandomPolyQVector(sampler, cols)
 	}
 	return PolyQMatrix(newMatrix)
 }
