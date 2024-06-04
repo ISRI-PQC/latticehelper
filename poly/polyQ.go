@@ -1,15 +1,16 @@
 package poly
 
 import (
+	cr "crypto/rand"
 	"fmt"
 	"log"
 	"math/big"
+	"math/rand/v2"
 	"strconv"
 	"strings"
 
 	"cyber.ee/pq/devkit"
 	"github.com/tuneinsight/lattigo/v5/ring"
-	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
 
 type PolyQ struct {
@@ -55,18 +56,31 @@ func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
 	return PolyQ{ret}
 }
 
-func NewRandomPolyQWithMaxInfNorm(maxInfNorm int64) PolyQ {
+// use empty seed array to use random seed
+func NewRandomPolyQWithMaxInfNorm(seed [32]byte, maxInfNorm int64) PolyQ {
 	ret := devkit.MainRing.NewPoly()
-
 	newCoeffs := make([]*big.Int, devkit.MainRing.N())
 
+	var r *rand.Rand
+
+	if seed == [32]byte{} {
+		seed32 := make([]byte, 32)
+		_, err := cr.Read(seed32)
+		if err != nil {
+			panic(err)
+		}
+		seed = [32]byte(seed32)
+	}
+
+	r = rand.New(rand.NewChaCha8(seed))
+
 	for i := range newCoeffs {
-		c := sampling.RandInt(big.NewInt(maxInfNorm + 1))
-		if sampling.RandFloat64(0.0, 1.0) > 0.5 {
-			c = c.Neg(c)
+		c := r.Int64N(maxInfNorm + 1)
+		if r.Float64() > 0.5 {
+			c = -c
 		}
 
-		newCoeffs[i] = c
+		newCoeffs[i] = big.NewInt(c)
 	}
 
 	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret)

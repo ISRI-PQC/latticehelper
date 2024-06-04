@@ -67,9 +67,13 @@ func NewRandomPolyQVector(sampler *ring.UniformSampler, length int) PolyQVector 
 }
 
 func NewRandomPolyQVectorWithMaxInfNorm(length int, maxInfNorm int64) PolyQVector {
+	return NewRandomPolyQVectorWithMaxInfNormWithSeed([32]byte{}, length, maxInfNorm)
+}
+
+func NewRandomPolyQVectorWithMaxInfNormWithSeed(seed [32]byte, length int, maxInfNorm int64) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
-		vec[i] = poly.NewRandomPolyQWithMaxInfNorm(maxInfNorm)
+		vec[i] = poly.NewRandomPolyQWithMaxInfNorm(seed, maxInfNorm)
 	}
 	return vec
 }
