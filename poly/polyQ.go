@@ -51,28 +51,33 @@ func NewConstantPolyQ(constant int64) PolyQ {
 }
 
 // Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+// If sampler is nil, default one will be used
 func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
+	if sampler == nil {
+		sampler = devkit.DefaultUniformSampler
+	}
+
 	ret := sampler.ReadNew()
 	return PolyQ{ret}
 }
 
-// use empty seed array to use random seed
-func NewRandomPolyQWithMaxInfNorm(seed [32]byte, maxInfNorm int64) PolyQ {
+// Input nil seed to use random seed, otherwise, only first 32 bytes from seed will be used!
+func NewRandomPolyQWithMaxInfNorm(seed []byte, maxInfNorm int64) PolyQ {
 	ret := devkit.MainRing.NewPoly()
 	newCoeffs := make([]*big.Int, devkit.MainRing.N())
 
 	var r *rand.Rand
 
-	if seed == [32]byte{} {
+	if seed == nil {
 		seed32 := make([]byte, 32)
 		_, err := cr.Read(seed32)
 		if err != nil {
 			panic(err)
 		}
-		seed = [32]byte(seed32)
+		seed = seed32
 	}
 
-	r = rand.New(rand.NewChaCha8(seed))
+	r = rand.New(rand.NewChaCha8([32]byte(seed)))
 
 	for i := range newCoeffs {
 		c := r.Int64N(maxInfNorm + 1)

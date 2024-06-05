@@ -1,32 +1,27 @@
 # PQDevKit
 
-This repository contains all necessary files and instructions to create wrappers for common PQC constructs required for PQ engineering.
+Idea to create this library came up from seeing concrete similarities between different custom PQ protocols.
 
-The purpose is to have a common set of full-fledged functions available in multiple components built with different languages. This will allow for a more consistent and efficient development of PQ components. Also, having these functions implemented in C/C++ by people who understand them much better allows for better performance.
+The purpose is to have a common set of full-fledged functions available in multiple components. This will allow for a more consistent and efficient development of PQ components.
 
-## Initial remarks
+Under the hood, it is utilizing [LattiGo library](https://github.com/tuneinsight/lattigo) for it's ring capabilities (and most importantly NTT and INTT functions).
 
-At first, focus will be on lattice-based cryptography (basically everything required for [TOPCOAT](https://gitlab.cyber.ee/nsnetkov/topcoat/-/tree/python-implementation?ref_type=heads) and [pq-cast-as-intented](https://gitlab.cyber.ee/pq-ivxv/pq-cast-as-intended)).
+## Features
 
-Libraries like [libNTL](https://libntl.org/) and [BPAS](https://bpaslib.org/) should be utilized for the heavy lifting.
-For ease of use, we will also include a wrapper for [liboqs](https://github.com/open-quantum-safe/liboqs)
+- Polynomial arithmetic in two different rings:
+    - ring `R` over Z[X]/(X^d + 1)
+        - coefficients are all natural numbers, poly is modulo X^d + 1
+        - in this library, naming is regular `poly...`
+    - ring `Rq` over Z_q[X]/(X^d + 1)
+        - coefficients are in range from 0 to q-1, poly is modulo X^d + 1
+        - in this library, naming is `polyQ...`
+- Vector and matrix arithmetic in both rings.
+- some util functions like Power2Round, checking bounds, norms, etc.
 
-Initial target languages are Python and Go.
+## Initialization
 
-## TODO
-- [ ] Consider using CMakeLists.txt for SWIG
-- [ ] Consider using SWIG directives in C/C++ files directly
+`devkit.InitSingle()` or `devkit.InitMultiple()` MUST be called at least once before using anything related to `polyQ`. Arguments are `d` and modulus `q`/moduli `\[q1, q2, q3,...\]`. `InitMultiple` can prepare parameters between multiple rings `Rq`, but has not been tested that much yet.
 
-## Project structure
+## Concurrency
 
-## Prerequisites
-
-
-## Go notes
-
-```
-export LIBOQS_ROOT="CHANGE_ME: <path-to-liboqs-repo>"
-export DYLD_FALLBACK_LIBRARY_PATH="$DYLD_FALLBACK_LIBRARY_PATH:$LIBOQS_ROOT/build/lib" # only for macOS
-export CGO_CPPFLAGS="-I$LIBOQS_ROOT/build/include"
-export CGO_LDFLAGS="-L$LIBOQS_ROOT/build/lib -loqs"
-```
+If not state otherwise, all functions should be thread safe and do not require any locks. Exception is `NewRandomPolyQ{matrix|vector|""}` functions require thread unique sampler. If used concurrently, create new sampler in each thread by `devkit.NewSampler`.

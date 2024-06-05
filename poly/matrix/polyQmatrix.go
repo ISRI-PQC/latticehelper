@@ -55,6 +55,7 @@ func NewPolyQMatrixFromCoeffs(coeffMat [][][]int64) PolyQMatrix {
 }
 
 // Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+// If sampler is nil, default one will be used
 func NewRandomPolyQMatrix(sampler *ring.UniformSampler, rows, cols int) PolyQMatrix {
 	newMatrix := make(PolyQMatrix, rows)
 	for i := 0; i < rows; i++ {

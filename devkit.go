@@ -28,7 +28,7 @@ func InitMultiple(degree int64, moduli []uint64) error {
 
 	MainRing = r
 
-	s, err := GetSampler()
+	s, err := GetSampler(nil)
 
 	if err != nil {
 		return err
@@ -39,8 +39,16 @@ func InitMultiple(degree int64, moduli []uint64) error {
 	return nil
 }
 
-func GetSampler() (*ring.UniformSampler, error) {
-	prng, err := sampling.NewPRNG()
+// Seed == null means use random sampler
+func GetSampler(seed []byte) (*ring.UniformSampler, error) {
+	var prng *sampling.KeyedPRNG
+	var err error
+
+	if seed == nil {
+		prng, err = sampling.NewPRNG()
+	} else {
+		prng, err = sampling.NewKeyedPRNG(seed)
+	}
 
 	if err != nil {
 		return nil, err

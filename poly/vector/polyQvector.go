@@ -58,6 +58,7 @@ func NewZeroPolyQVector(length int) PolyQVector {
 }
 
 // Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+// If sampler is nil, default one will be used
 func NewRandomPolyQVector(sampler *ring.UniformSampler, length int) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
@@ -67,10 +68,11 @@ func NewRandomPolyQVector(sampler *ring.UniformSampler, length int) PolyQVector 
 }
 
 func NewRandomPolyQVectorWithMaxInfNorm(length int, maxInfNorm int64) PolyQVector {
-	return NewRandomPolyQVectorWithMaxInfNormWithSeed([32]byte{}, length, maxInfNorm)
+	return NewRandomPolyQVectorWithMaxInfNormWithSeed(nil, length, maxInfNorm)
 }
 
-func NewRandomPolyQVectorWithMaxInfNormWithSeed(seed [32]byte, length int, maxInfNorm int64) PolyQVector {
+// Input nil seed to use random seed, otherwise, only first 32 bytes from seed will be used!
+func NewRandomPolyQVectorWithMaxInfNormWithSeed(seed []byte, length int, maxInfNorm int64) PolyQVector {
 	vec := make(PolyQVector, length)
 	for i := 0; i < len(vec); i++ {
 		vec[i] = poly.NewRandomPolyQWithMaxInfNorm(seed, maxInfNorm)
