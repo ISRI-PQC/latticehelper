@@ -24,4 +24,6 @@ Under the hood, it is utilizing [LattiGo library](https://github.com/tuneinsight
 
 ## Concurrency
 
-If not state otherwise, all functions should be thread safe and do not require any locks. Exception is `NewRandomPolyQ{matrix|vector|""}` functions require thread unique sampler. If used concurrently, create new sampler in each thread by `devkit.NewSampler`.
+If not stated otherwise, all functions should be thread safe and do not require any locks.
+
+Only exception to that rule are functions `NewRandomPolyQ{matrix|vector|""}`, which require a thread-unique sampler. If these functions are used concurrently (i.e. called multiple times at the same time), create new sampler in each thread by `devkit.NewSampler` for them.
