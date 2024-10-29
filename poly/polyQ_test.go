@@ -56,7 +56,7 @@ func TestPolyQPow(t *testing.T) {
 }
 
 func TestPolyQScale(t *testing.T) {
-	result := NewPolyQFromCoeffs(2, 3).ScaleByInt(5)
+	result := NewPolyQFromCoeffs(2, 3).ScaledByInt(5)
 	expected := NewPolyQFromCoeffs(10, 15)
 	if !result.Equals(expected) {
 		t.Error("Poly scale failed")

@@ -31,7 +31,7 @@ func TestPolyNeg(t *testing.T) {
 }
 
 func TestPolyAdd(t *testing.T) {
-	result := NewPolyFromCoeffs(1, 2).Add(NewPolyFromCoeffs(3, 4))
+	result := NewPolyFromCoeffs(1, 2).Add(NewPolyFromCoeffs(3, 4)).(Poly)
 	expected := NewPolyFromCoeffs(4, 6)
 	if !result.Equals(expected) {
 		t.Error("Poly addition failed")
@@ -39,7 +39,7 @@ func TestPolyAdd(t *testing.T) {
 }
 
 func TestPolySub(t *testing.T) {
-	result := NewPolyFromCoeffs(1, 2).Sub(NewPolyFromCoeffs(3, 4))
+	result := NewPolyFromCoeffs(1, 2).Sub(NewPolyFromCoeffs(3, 4)).(Poly)
 	expected := NewPolyFromCoeffs(-2, -2)
 	if !result.Equals(expected) {
 		t.Error("Poly subtraction failed")
@@ -47,7 +47,7 @@ func TestPolySub(t *testing.T) {
 }
 
 func TestPolyMul(t *testing.T) {
-	result := NewPolyFromCoeffs(1, 2, 3, 4).Mul(NewPolyFromCoeffs(5, 6, 7, 8))
+	result := NewPolyFromCoeffs(1, 2, 3, 4).Mul(NewPolyFromCoeffs(5, 6, 7, 8)).(Poly)
 	expected := NewPolyFromCoeffs(5, 16, 34, 60, 61, 52, 32)
 	if !result.Equals(expected) {
 		t.Error("Poly multiplication failed")
@@ -63,7 +63,7 @@ func TestPolyPow(t *testing.T) {
 }
 
 func TestPolyScale(t *testing.T) {
-	result := NewPolyFromCoeffs(2, 3).ScaleByInt(5)
+	result := NewPolyFromCoeffs(2, 3).ScaledByInt(5)
 	expected := NewPolyFromCoeffs(10, 15)
 	if !result.Equals(expected) {
 		t.Error("Poly scale failed")

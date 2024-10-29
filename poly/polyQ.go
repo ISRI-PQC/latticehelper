@@ -184,11 +184,11 @@ func (poly PolyQ) Listize() []int64 {
 	return ret
 }
 
-func (poly PolyQ) ApplyToEveryCoeff(f func(uint64) any) {
+func (poly *PolyQ) ApplyToEveryCoeff(f func(int64) any) {
 	newCoeffs := make([]*big.Int, poly.Length())
 
 	for i := 0; i < poly.Length(); i++ {
-		c := f(poly.Coeffs[devkit.MainRing.Level()][i])
+		c := f(int64(poly.Coeffs[devkit.MainRing.Level()][i]))
 		switch t := c.(type) {
 		case int64:
 			newCoeffs[i] = new(big.Int).SetInt64(t)
@@ -229,16 +229,16 @@ func (poly PolyQ) HighBits(alpha int64) PolyQ {
 	return PolyQ{*ret}
 }
 
-func (poly PolyQ) Neg() PolyProxy {
+func (poly PolyQ) Neg() PolyQ {
 	retPoly := NewPolyQ()
 	devkit.MainRing.Neg(poly.Poly, retPoly.Poly)
 	return retPoly
 }
 
-func (poly PolyQ) Add(inputPolyProxy PolyProxy) PolyProxy {
+func (poly PolyQ) Add(inputPolynomial Polynomial) PolyQ {
 	var inputPolyQ PolyQ
 
-	switch input := inputPolyProxy.(type) {
+	switch input := inputPolynomial.(type) {
 	case PolyQ:
 		inputPolyQ = input
 	case Poly:
@@ -252,10 +252,10 @@ func (poly PolyQ) Add(inputPolyProxy PolyProxy) PolyProxy {
 
 }
 
-func (poly PolyQ) Sub(inputPolyProxy PolyProxy) PolyProxy {
+func (poly PolyQ) Sub(inputPolynomial Polynomial) PolyQ {
 	var inputPolyQ PolyQ
 
-	switch input := inputPolyProxy.(type) {
+	switch input := inputPolynomial.(type) {
 	case PolyQ:
 		inputPolyQ = input
 	case Poly:
@@ -268,10 +268,10 @@ func (poly PolyQ) Sub(inputPolyProxy PolyProxy) PolyProxy {
 	return retPoly
 }
 
-func (poly PolyQ) Mul(inputPolyProxy PolyProxy) PolyProxy {
+func (poly PolyQ) Mul(inputPolynomial Polynomial) PolyQ {
 	var inputPolyQ PolyQ
 
-	switch input := inputPolyProxy.(type) {
+	switch input := inputPolynomial.(type) {
 	case PolyQ:
 		inputPolyQ = input
 	case Poly:
@@ -293,7 +293,7 @@ func (poly PolyQ) Mul(inputPolyProxy PolyProxy) PolyProxy {
 	return retPoly
 }
 
-func (poly PolyQ) Pow(exp int64) PolyProxy {
+func (poly PolyQ) Pow(exp int64) PolyQ {
 	if exp < 0 {
 		log.Panic("Pow: Negative powers are not supported for elements of a PolyQ")
 	}
@@ -302,17 +302,17 @@ func (poly PolyQ) Pow(exp int64) PolyProxy {
 
 	for exp > 0 {
 		if exp%2 == 1 {
-			g = g.Mul(poly).(PolyQ)
+			g = g.Mul(poly)
 		}
 
-		poly = poly.Mul(PolyQ{*poly.CopyNew()}).(PolyQ)
+		poly = poly.Mul(PolyQ{*poly.CopyNew()})
 		exp = devkit.FloorDivision(exp, 2)
 	}
 
 	return g
 }
 
-func (poly PolyQ) ScaleByInt(scalar int64) PolyProxy {
+func (poly PolyQ) ScaledByInt(scalar int64) PolyQ {
 	retPoly := NewPolyQ()
 
 	sc := devkit.PositiveMod(scalar, devkit.MainRing.Modulus().Int64())
@@ -322,7 +322,7 @@ func (poly PolyQ) ScaleByInt(scalar int64) PolyProxy {
 	return retPoly
 }
 
-func (poly PolyQ) AddToFirstCoeff(input int64) PolyProxy {
+func (poly PolyQ) AddedToFirstCoeff(input int64) PolyQ {
 	retPoly := *poly.CopyNew()
 
 	inputQ := devkit.PositiveMod(input, devkit.MainRing.Modulus().Int64())
@@ -334,11 +334,6 @@ func (poly PolyQ) AddToFirstCoeff(input int64) PolyProxy {
 	return PolyQ{retPoly}
 }
 
-func (poly PolyQ) Equals(other PolyProxy) bool {
-	switch input := other.(type) {
-	case PolyQ:
-		return devkit.MainRing.Equal(poly.Poly, input.Poly)
-	default:
-		return false
-	}
+func (poly PolyQ) Equals(other PolyQ) bool {
+	return devkit.MainRing.Equal(poly.Poly, other.Poly)
 }

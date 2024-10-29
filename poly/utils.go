@@ -60,7 +60,7 @@ func schoolbookMultiplication(p1, p2 []int64) []int64 {
 	if len(p1) != len(p2) {
 		log.Panic("schoolbookMultiplication: p1 and p2 must be of the same length")
 	}
-	n := devkit.MainRing.N()
+	n := len(p1)
 
 	newCoeffs := make([]int64, n)
 

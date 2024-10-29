@@ -17,7 +17,7 @@ import (
 type Poly []int64
 
 func NewPolyFromCoeffs(coeffs ...int64) Poly {
-	l := len(coeffs)
+	l := devkit.MainRing.N()
 
 	ret := make(Poly, l)
 	copy(ret, coeffs)
@@ -127,8 +127,8 @@ func (coeffs *Poly) ApplyToEveryCoeff(f func(int64) any) {
 	}
 }
 
-func (poly Poly) CheckNormBound(bound int64) bool {
-	for _, coeff := range poly {
+func (coeffs Poly) CheckNormBound(bound int64) bool {
+	for _, coeff := range coeffs {
 		if checkNormBound(coeff, bound, devkit.MainRing.Modulus().Int64()) {
 			return true
 		}
@@ -136,10 +136,10 @@ func (poly Poly) CheckNormBound(bound int64) bool {
 	return false
 }
 
-func (poly Poly) LowBits(alpha int64) Poly {
-	ret := make(Poly, len(poly))
+func (coeffs Poly) LowBits(alpha int64) Poly {
+	ret := make(Poly, len(coeffs))
 
-	for i, coeff := range poly {
+	for i, coeff := range coeffs {
 		ret[i] = lowBits(coeff, alpha, devkit.MainRing.Modulus().Int64())
 	}
 
@@ -154,7 +154,7 @@ func (coeffs Poly) Listize() []int64 {
 	return coeffs
 }
 
-func (coeffs Poly) Neg() PolyProxy {
+func (coeffs Poly) Neg() Poly {
 	ret := make(Poly, len(coeffs))
 	for i, coeff := range coeffs {
 		ret[i] = -coeff
@@ -162,8 +162,8 @@ func (coeffs Poly) Neg() PolyProxy {
 	return ret
 }
 
-func (coeffs Poly) Add(inputPolyProxy PolyProxy) PolyProxy {
-	switch input := inputPolyProxy.(type) {
+func (coeffs Poly) Add(inputPolynomial Polynomial) Polynomial {
+	switch input := inputPolynomial.(type) {
 	case Poly:
 		ret := make(Poly, devkit.MainRing.N())
 		for i, coeff := range coeffs {
@@ -178,8 +178,8 @@ func (coeffs Poly) Add(inputPolyProxy PolyProxy) PolyProxy {
 	}
 }
 
-func (coeffs Poly) Sub(inputPolyProxy PolyProxy) PolyProxy {
-	switch input := inputPolyProxy.(type) {
+func (coeffs Poly) Sub(inputPolynomial Polynomial) Polynomial {
+	switch input := inputPolynomial.(type) {
 	case Poly:
 		ret := make(Poly, devkit.MainRing.N())
 		for i, coeff := range coeffs {
@@ -194,8 +194,8 @@ func (coeffs Poly) Sub(inputPolyProxy PolyProxy) PolyProxy {
 	}
 }
 
-func (coeffs Poly) Mul(inputPolyProxy PolyProxy) PolyProxy {
-	switch input := inputPolyProxy.(type) {
+func (coeffs Poly) Mul(inputPolynomial Polynomial) Polynomial {
+	switch input := inputPolynomial.(type) {
 	case Poly:
 		return Poly(schoolbookMultiplication(coeffs, input))
 	case PolyQ:
@@ -206,7 +206,7 @@ func (coeffs Poly) Mul(inputPolyProxy PolyProxy) PolyProxy {
 	}
 }
 
-func (poly Poly) Pow(exp int64) PolyProxy {
+func (coeffs Poly) Pow(exp int64) Poly {
 	if exp < 0 {
 		log.Panic("Pow: Negative powers are not supported for elements of a PolyQ")
 	}
@@ -215,17 +215,17 @@ func (poly Poly) Pow(exp int64) PolyProxy {
 
 	for exp > 0 {
 		if exp%2 == 1 {
-			g = g.Mul(poly).(Poly)
+			g = g.Mul(coeffs).(Poly)
 		}
 
-		poly = poly.Mul(poly).(Poly)
+		coeffs = coeffs.Mul(coeffs).(Poly)
 		exp = devkit.FloorDivision(exp, 2)
 	}
 
 	return g
 }
 
-func (coeffs Poly) ScaleByInt(scalar int64) PolyProxy {
+func (coeffs Poly) ScaledByInt(scalar int64) Poly {
 	ret := make(Poly, devkit.MainRing.N())
 	for i, coeff := range coeffs {
 		ret[i] = coeff * scalar
@@ -233,17 +233,12 @@ func (coeffs Poly) ScaleByInt(scalar int64) PolyProxy {
 	return ret
 }
 
-func (coeffs Poly) AddToFirstCoeff(input int64) PolyProxy {
+func (coeffs *Poly) AddedToFirstCoeff(input int64) *Poly {
 	ret := coeffs
-	ret[0] += input
+	(*ret)[0] += input
 	return ret
 }
 
-func (coeffs Poly) Equals(other PolyProxy) bool {
-	switch other.(type) {
-	case Poly:
-		return reflect.DeepEqual(coeffs, other)
-	default:
-		return false
-	}
+func (coeffs Poly) Equals(other Poly) bool {
+	return reflect.DeepEqual(coeffs, other)
 }

@@ -94,7 +94,7 @@ func (vec PolyQVector) Power2Round(d int64) (PolyQVector, PolyQVector) {
 	return r1polys, r0polys
 }
 
-func (vec *PolyQVector) ApplyToEveryCoeff(f func(uint64) any) {
+func (vec *PolyQVector) ApplyToEveryCoeff(f func(int64) any) {
 	for _, poly := range *vec {
 		poly.ApplyToEveryCoeff(f)
 	}
@@ -173,25 +173,25 @@ func (vec PolyQVector) SecondNorm() float64 {
 	return math.Sqrt(float64(sum))
 }
 
-func (vec PolyQVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyVector {
+func (vec PolyQVector) ScaledByPolyProxy(inputPolyProxy poly.Polynomial) PolyQVector {
 	newVec := make(PolyQVector, vec.Length())
 	for i, currentPoly := range vec {
-		newVec[i] = currentPoly.Mul(inputPolyProxy).(poly.PolyQ)
+		newVec[i] = currentPoly.Mul(inputPolyProxy)
 	}
 
 	return newVec
 }
 
-func (vec PolyQVector) ScaleByInt(input int64) PolyProxyVector {
+func (vec PolyQVector) ScaledByInt(input int64) PolyQVector {
 	newVec := make(PolyQVector, vec.Length())
 	for i, currentPoly := range vec {
-		newVec[i] = currentPoly.ScaleByInt(input).(poly.PolyQ)
+		newVec[i] = currentPoly.ScaledByInt(input)
 	}
 
 	return newVec
 }
 
-func (vec PolyQVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
+func (vec PolyQVector) Add(inputPolyProxyVector PolynomialVector) PolyQVector {
 	var inputPolyQVector PolyQVector
 
 	switch input := inputPolyProxyVector.(type) {
@@ -207,12 +207,12 @@ func (vec PolyQVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector
 
 	newVec := make(PolyQVector, vec.Length())
 	for i, currentPoly := range vec {
-		newVec[i] = currentPoly.Add(inputPolyQVector[i]).(poly.PolyQ)
+		newVec[i] = currentPoly.Add(inputPolyQVector[i])
 	}
 	return newVec
 }
 
-func (vec PolyQVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
+func (vec PolyQVector) Sub(inputPolyProxyVector PolynomialVector) PolyQVector {
 	var inputPolyQVector PolyQVector
 
 	switch input := inputPolyProxyVector.(type) {
@@ -228,12 +228,12 @@ func (vec PolyQVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector
 
 	newVec := make(PolyQVector, vec.Length())
 	for i, currentPoly := range vec {
-		newVec[i] = currentPoly.Sub(inputPolyQVector[i]).(poly.PolyQ)
+		newVec[i] = currentPoly.Sub(inputPolyQVector[i])
 	}
 	return newVec
 }
 
-func (vec PolyQVector) Concat(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
+func (vec PolyQVector) Concat(inputPolyProxyVector PolynomialVector) PolyQVector {
 	var inputPolyQVector PolyQVector
 
 	switch input := inputPolyProxyVector.(type) {
@@ -251,7 +251,7 @@ func (vec PolyQVector) Concat(inputPolyProxyVector PolyProxyVector) PolyProxyVec
 	return newVec
 }
 
-func (vec PolyQVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.PolyProxy {
+func (vec PolyQVector) DotProduct(inputPolyProxyVector PolynomialVector) poly.PolyQ {
 	var inputPolyQVector PolyQVector
 
 	switch input := inputPolyProxyVector.(type) {
@@ -281,16 +281,11 @@ func (vec PolyQVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.Pol
 	return newPoly
 }
 
-func (vec PolyQVector) Equals(other PolyProxyVector) bool {
-	switch input := other.(type) {
-	case PolyQVector:
-		for i := 0; i < vec.Length(); i++ {
-			if !vec[i].Equals(input[i]) {
-				return false
-			}
+func (vec PolyQVector) Equals(other PolyQVector) bool {
+	for i := 0; i < vec.Length(); i++ {
+		if !vec[i].Equals(other[i]) {
+			return false
 		}
-		return true
-	default:
-		return false
 	}
+	return true
 }

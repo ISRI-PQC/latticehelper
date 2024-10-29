@@ -45,7 +45,7 @@ func TestPolyVectorDotProduct(t *testing.T) {
 
 	expected := poly.NewPolyFromCoeffs(47, 116, 209, 168, 99)
 
-	result := base.DotProduct(other)
+	result := base.DotProduct(other).(poly.Poly)
 
 	if !expected.Equals(result) {
 		t.Errorf("Expected %v but got %v", expected, result)

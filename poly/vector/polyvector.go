@@ -90,12 +90,10 @@ func (vec PolyVector) WithCenteredModulo() PolyVector {
 	return ret
 }
 
-func (vec *PolyVector) ApplyToEveryCoeff(f func(int64) any) *PolyVector {
+func (vec *PolyVector) ApplyToEveryCoeff(f func(int64) any) {
 	for _, poly := range *vec {
 		poly.ApplyToEveryCoeff(f)
 	}
-
-	return vec
 }
 
 func (vec PolyVector) Length() int {
@@ -127,7 +125,7 @@ func (vec PolyVector) LowBits(alpha int64) PolyVector {
 	return newVec
 }
 
-func (vec PolyVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyVector {
+func (vec PolyVector) ScaledByPolyProxy(inputPolyProxy poly.Polynomial) PolynomialVector {
 	switch input := inputPolyProxy.(type) {
 	case poly.Poly:
 		ret := make(PolyVector, len(vec))
@@ -141,7 +139,7 @@ func (vec PolyVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyV
 		newVec := make(PolyQVector, vec.Length())
 
 		for i, polyQ := range currentPolyQVector {
-			newVec[i] = polyQ.Mul(input).(poly.PolyQ)
+			newVec[i] = polyQ.Mul(input)
 		}
 		return newVec
 	default:
@@ -150,21 +148,21 @@ func (vec PolyVector) ScaleByPolyProxy(inputPolyProxy poly.PolyProxy) PolyProxyV
 	}
 }
 
-func (vec PolyVector) ScaleByInt(input int64) PolyProxyVector {
+func (vec PolyVector) ScaledByInt(input int64) PolyVector {
 	newVec := make(PolyVector, vec.Length())
 	for i, currentPoly := range vec {
-		newVec[i] = currentPoly.ScaleByInt(input).(poly.Poly)
+		newVec[i] = currentPoly.ScaledByInt(input)
 	}
 
 	return newVec
 }
 
-func (vec PolyVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
-	if inputPolyProxyVector.Length() != vec.Length() {
+func (vec PolyVector) Add(inputPolynomialVector PolynomialVector) PolynomialVector {
+	if inputPolynomialVector.Length() != vec.Length() {
 		log.Panic("Add: two vectors don't have the same length.")
 	}
 
-	switch input := inputPolyProxyVector.(type) {
+	switch input := inputPolynomialVector.(type) {
 	case PolyVector:
 		ret := make(PolyVector, len(vec))
 		for i, currentPoly := range vec {
@@ -177,7 +175,7 @@ func (vec PolyVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector 
 		newVec := make(PolyQVector, vec.Length())
 
 		for i, polyQ := range currentPolyQVector {
-			newVec[i] = polyQ.Add(input[i]).(poly.PolyQ)
+			newVec[i] = polyQ.Add(input[i])
 		}
 		return newVec
 	default:
@@ -186,12 +184,12 @@ func (vec PolyVector) Add(inputPolyProxyVector PolyProxyVector) PolyProxyVector 
 	}
 }
 
-func (vec PolyVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
-	if inputPolyProxyVector.Length() != vec.Length() {
+func (vec PolyVector) Sub(inputPolynomialVector PolynomialVector) PolynomialVector {
+	if inputPolynomialVector.Length() != vec.Length() {
 		log.Panic("Sub: two vectors don't have the same length.")
 	}
 
-	switch input := inputPolyProxyVector.(type) {
+	switch input := inputPolynomialVector.(type) {
 	case PolyVector:
 		ret := make(PolyVector, len(vec))
 		for i, currentPoly := range vec {
@@ -204,7 +202,7 @@ func (vec PolyVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector 
 		newVec := make(PolyQVector, vec.Length())
 
 		for i, polyQ := range currentPolyQVector {
-			newVec[i] = polyQ.Sub(input[i]).(poly.PolyQ)
+			newVec[i] = polyQ.Sub(input[i])
 		}
 		return newVec
 	default:
@@ -213,8 +211,8 @@ func (vec PolyVector) Sub(inputPolyProxyVector PolyProxyVector) PolyProxyVector 
 	}
 }
 
-func (vec PolyVector) Concat(inputPolyProxyVector PolyProxyVector) PolyProxyVector {
-	switch input := inputPolyProxyVector.(type) {
+func (vec PolyVector) Concat(inputPolynomialVector PolynomialVector) PolynomialVector {
+	switch input := inputPolynomialVector.(type) {
 	case PolyVector:
 		ret := make(PolyVector, 0, vec.Length()+input.Length())
 		ret = append(ret, vec...)
@@ -233,12 +231,12 @@ func (vec PolyVector) Concat(inputPolyProxyVector PolyProxyVector) PolyProxyVect
 	}
 }
 
-func (vec PolyVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.PolyProxy {
-	if inputPolyProxyVector.Length() != vec.Length() {
+func (vec PolyVector) DotProduct(inputPolynomialVector PolynomialVector) poly.Polynomial {
+	if inputPolynomialVector.Length() != vec.Length() {
 		log.Panic("DotProduct: two vectors don't have the same length.")
 	}
 
-	switch input := inputPolyProxyVector.(type) {
+	switch input := inputPolynomialVector.(type) {
 	case PolyVector:
 		ret := make(poly.Poly, vec[0].Length())
 
@@ -270,16 +268,11 @@ func (vec PolyVector) DotProduct(inputPolyProxyVector PolyProxyVector) poly.Poly
 	}
 }
 
-func (vec PolyVector) Equals(other PolyProxyVector) bool {
-	switch input := other.(type) {
-	case PolyVector:
-		for i := 0; i < vec.Length(); i++ {
-			if !vec[i].Equals(input[i]) {
-				return false
-			}
+func (vec PolyVector) Equals(other PolyVector) bool {
+	for i := 0; i < vec.Length(); i++ {
+		if !vec[i].Equals(other[i]) {
+			return false
 		}
-		return true
-	default:
-		return false
 	}
+	return true
 }
