@@ -3,11 +3,11 @@ package poly
 import (
 	"log"
 
-	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/latticehelper"
 )
 
 func CenteredModulo(x, q int64) int64 {
-	ret := devkit.PositiveMod(x, q)
+	ret := latticehelper.PositiveMod(x, q)
 	if ret > (q >> 1) {
 		ret -= q
 	}
@@ -15,7 +15,7 @@ func CenteredModulo(x, q int64) int64 {
 }
 
 func checkNormBound(n, b, q int64) bool {
-	x := devkit.PositiveMod(n, q)
+	x := latticehelper.PositiveMod(n, q)
 	x = ((q - 1) >> 1) - x
 	x = x ^ (x >> 31)
 	x = ((q - 1) >> 1) - x
@@ -23,14 +23,14 @@ func checkNormBound(n, b, q int64) bool {
 }
 
 func decompose(r, a, q int64) (int64, int64) {
-	r = devkit.PositiveMod(r, q)
+	r = latticehelper.PositiveMod(r, q)
 	r0 := CenteredModulo(r, a)
 	r1 := r - r0
 	if r1 == q-1 {
 		return 0, r0 - 1
 	}
 
-	r1 = devkit.FloorDivision(r1, a)
+	r1 = latticehelper.FloorDivision(r1, a)
 	if r != r1*a+r0 {
 		panic("r!= r1*a+r0")
 	}

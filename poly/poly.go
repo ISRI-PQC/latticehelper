@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/latticehelper"
 	"github.com/raszia/gotiny"
 	"github.com/tuneinsight/lattigo/v5/utils/sampling"
 )
@@ -17,7 +17,7 @@ import (
 type Poly []int64
 
 func NewPolyFromCoeffs(coeffs ...int64) Poly {
-	l := devkit.MainRing.N()
+	l := latticehelper.MainRing.N()
 
 	ret := make(Poly, l)
 	copy(ret, coeffs)
@@ -26,18 +26,18 @@ func NewPolyFromCoeffs(coeffs ...int64) Poly {
 }
 
 func NewPoly() Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	return ret
 }
 
 func NewConstantPoly(constant int64) Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	ret[0] = constant
 	return ret
 }
 
 func NewRandomPoly() Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	for i := 0; i < len(ret); i++ {
 		ret[i] = int64(sampling.RandUint64()) >> 8
 		if chance := rand.Float32(); chance < 0.5 {
@@ -96,13 +96,13 @@ func (coeffs Poly) String() string {
 
 func (coeffs Poly) Q() PolyQ {
 	ret := NewPolyQ()
-	newCoeffs := make([]*big.Int, devkit.MainRing.N())
+	newCoeffs := make([]*big.Int, latticehelper.MainRing.N())
 
 	for i, coeff := range coeffs {
 		newCoeffs[i] = big.NewInt(coeff)
 	}
 
-	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret.Poly)
+	latticehelper.MainRing.SetCoefficientsBigint(newCoeffs, ret.Poly)
 
 	return ret
 }
@@ -110,7 +110,7 @@ func (coeffs Poly) Q() PolyQ {
 func (coeffs Poly) WithCenteredModulo() Poly {
 	ret := make([]int64, len(coeffs))
 	for i, coeff := range coeffs {
-		ret[i] = CenteredModulo(coeff, devkit.MainRing.Modulus().Int64())
+		ret[i] = CenteredModulo(coeff, latticehelper.MainRing.Modulus().Int64())
 	}
 	return ret
 }
@@ -129,7 +129,7 @@ func (coeffs *Poly) ApplyToEveryCoeff(f func(int64) any) {
 
 func (coeffs Poly) CheckNormBound(bound int64) bool {
 	for _, coeff := range coeffs {
-		if checkNormBound(coeff, bound, devkit.MainRing.Modulus().Int64()) {
+		if checkNormBound(coeff, bound, latticehelper.MainRing.Modulus().Int64()) {
 			return true
 		}
 	}
@@ -140,7 +140,7 @@ func (coeffs Poly) LowBits(alpha int64) Poly {
 	ret := make(Poly, len(coeffs))
 
 	for i, coeff := range coeffs {
-		ret[i] = lowBits(coeff, alpha, devkit.MainRing.Modulus().Int64())
+		ret[i] = lowBits(coeff, alpha, latticehelper.MainRing.Modulus().Int64())
 	}
 
 	return ret
@@ -163,7 +163,7 @@ func (coeffs Poly) Neg() Poly {
 }
 
 func (coeffs Poly) Add(inputPoly Poly) Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	for i, coeff := range coeffs {
 		ret[i] = coeff + inputPoly[i]
 	}
@@ -171,7 +171,7 @@ func (coeffs Poly) Add(inputPoly Poly) Poly {
 }
 
 func (coeffs Poly) Sub(inputPoly Poly) Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	for i, coeff := range coeffs {
 		ret[i] = coeff - inputPoly[i]
 	}
@@ -195,14 +195,14 @@ func (coeffs Poly) Pow(exp int64) Poly {
 		}
 
 		coeffs = coeffs.Mul(coeffs)
-		exp = devkit.FloorDivision(exp, 2)
+		exp = latticehelper.FloorDivision(exp, 2)
 	}
 
 	return g
 }
 
 func (coeffs Poly) ScaledByInt(scalar int64) Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	for i, coeff := range coeffs {
 		ret[i] = coeff * scalar
 	}
@@ -210,7 +210,7 @@ func (coeffs Poly) ScaledByInt(scalar int64) Poly {
 }
 
 func (coeffs Poly) AddedToFirstCoeff(input int64) Poly {
-	ret := make(Poly, devkit.MainRing.N())
+	ret := make(Poly, latticehelper.MainRing.N())
 	copy(ret, coeffs)
 	ret[0] += input
 	return ret

@@ -1,4 +1,4 @@
-module cyber.ee/pq/devkit
+module cyber.ee/pq/latticehelper
 
 go 1.22.2
 

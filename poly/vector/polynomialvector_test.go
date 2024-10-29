@@ -3,12 +3,12 @@ package vector
 import (
 	"testing"
 
-	"cyber.ee/pq/devkit"
-	"cyber.ee/pq/devkit/poly"
+	"cyber.ee/pq/latticehelper"
+	"cyber.ee/pq/latticehelper/poly"
 )
 
 func TestMain(m *testing.M) {
-	devkit.InitSingle(128, 4294954753)
+	latticehelper.InitSingle(128, 4294954753)
 	m.Run()
 }
 
@@ -23,7 +23,7 @@ func TestPolyVectorSerialize(t *testing.T) {
 	}
 }
 func TestPolyQVectorSerialize(t *testing.T) {
-	p := NewRandomPolyQVector(devkit.DefaultUniformSampler, 5)
+	p := NewRandomPolyQVector(latticehelper.DefaultUniformSampler, 5)
 	b := p.Serialize()
 
 	n := DeserializePolyQVector(b)

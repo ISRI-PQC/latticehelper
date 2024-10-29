@@ -1,4 +1,4 @@
-# PQDevKit
+# LatticeHelper
 
 Idea to create this library came up from seeing concrete similarities between different custom PQ protocols.
 
@@ -20,10 +20,10 @@ Under the hood, it is utilizing [LattiGo library](https://github.com/tuneinsight
 
 ## Initialization
 
-`devkit.InitSingle()` or `devkit.InitMultiple()` MUST be called at least once before using anything related to `polyQ`. Arguments are `d` and modulus `q`/moduli `\[q1, q2, q3,...\]`. `InitMultiple` can prepare parameters between multiple rings `Rq`, but has not been tested that much yet.
+`latticehelper.InitSingle()` or `latticehelper.InitMultiple()` MUST be called at least once before using anything related to `polyQ`. Arguments are `d` and modulus `q`/moduli `\[q1, q2, q3,...\]`. `InitMultiple` can prepare parameters between multiple rings `Rq`, but has not been tested that much yet.
 
 ## Concurrency
 
 If not stated otherwise, all functions should be thread safe and do not require any locks.
 
-Only exception to that rule are functions `NewRandomPolyQ{matrix|vector|""}`, which require a thread-unique sampler. If these functions are used concurrently (i.e. called multiple times at the same time), create new sampler in each thread by `devkit.NewSampler` for them.
+Only exception to that rule are functions `NewRandomPolyQ{matrix|vector|""}`, which require a thread-unique sampler. If these functions are used concurrently (i.e. called multiple times at the same time), create new sampler in each thread by `latticehelper.NewSampler` for them.

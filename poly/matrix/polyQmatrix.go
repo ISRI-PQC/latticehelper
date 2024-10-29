@@ -6,9 +6,9 @@ import (
 	"log"
 	"strings"
 
-	"cyber.ee/pq/devkit"
-	"cyber.ee/pq/devkit/poly"
-	"cyber.ee/pq/devkit/poly/vector"
+	"cyber.ee/pq/latticehelper"
+	"cyber.ee/pq/latticehelper/poly"
+	"cyber.ee/pq/latticehelper/poly/vector"
 	"github.com/raszia/gotiny"
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
@@ -54,7 +54,7 @@ func NewPolyQMatrixFromCoeffs(coeffMat [][][]int64) PolyQMatrix {
 	return PolyQMatrix(newMatrix)
 }
 
-// Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+// Make sure sampler is not used concurrently. If needed, created new with latticehelper.GetSampler()
 // If sampler is nil, default one will be used
 func NewRandomPolyQMatrix(sampler *ring.UniformSampler, rows, cols int) PolyQMatrix {
 	newMatrix := make(PolyQMatrix, rows)
@@ -67,7 +67,7 @@ func NewRandomPolyQMatrix(sampler *ring.UniformSampler, rows, cols int) PolyQMat
 func NewIdentityPolyQMatrix(size int) PolyQMatrix {
 	newMatrix := NewZeroPolyQMatrix(size, size)
 	for i := 0; i < size; i++ {
-		newMatrix[i][i].Poly.Coeffs[devkit.MainRing.Level()][0] = uint64(1)
+		newMatrix[i][i].Poly.Coeffs[latticehelper.MainRing.Level()][0] = uint64(1)
 	}
 	return newMatrix
 }
@@ -122,7 +122,7 @@ func (mat PolyQMatrix) Cols() int {
 }
 
 func (mat PolyQMatrix) Listize() []int64 {
-	listizedVec := make([]int64, 0, mat.Rows()*mat.Cols()*devkit.MainRing.N())
+	listizedVec := make([]int64, 0, mat.Rows()*mat.Cols()*latticehelper.MainRing.N())
 
 	for _, polyQVec := range mat {
 		listizedVec = append(listizedVec, polyQVec.Listize()...)
@@ -263,7 +263,7 @@ func (mat PolyQMatrix) MatMul(inputPolyQMatrix PolyQMatrix) PolyQMatrix {
 	otherCols := inputPolyQMatrix.Cols()
 
 	newMat := make(PolyQMatrix, rows)
-	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
+	r := latticehelper.MainRing.AtLevel(latticehelper.MainRing.Level())
 
 	for i := 0; i < rows; i++ {
 		currentVec := make(vector.PolyQVector, otherCols)
@@ -300,7 +300,7 @@ func (mat PolyQMatrix) VecMul(inputPolyQVector vector.PolyQVector) vector.PolyQV
 	}
 	newVec := make(vector.PolyQVector, mat.Rows())
 
-	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
+	r := latticehelper.MainRing.AtLevel(latticehelper.MainRing.Level())
 	for i := 0; i < mat.Rows(); i++ {
 		currentPoly := poly.NewPolyQ()
 

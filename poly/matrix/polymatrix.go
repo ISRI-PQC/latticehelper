@@ -4,9 +4,9 @@ import (
 	"log"
 	"strings"
 
-	"cyber.ee/pq/devkit"
-	"cyber.ee/pq/devkit/poly"
-	"cyber.ee/pq/devkit/poly/vector"
+	"cyber.ee/pq/latticehelper"
+	"cyber.ee/pq/latticehelper/poly"
+	"cyber.ee/pq/latticehelper/poly/vector"
 	"github.com/raszia/gotiny"
 )
 
@@ -99,7 +99,7 @@ func (mat PolyMatrix) Cols() int {
 }
 
 func (mat PolyMatrix) Listize() []int64 {
-	listizedVec := make([]int64, 0, mat.Rows()*mat.Cols()*devkit.MainRing.N())
+	listizedVec := make([]int64, 0, mat.Rows()*mat.Cols()*latticehelper.MainRing.N())
 
 	for _, polyQVec := range mat {
 		listizedVec = append(listizedVec, polyQVec.Listize()...)

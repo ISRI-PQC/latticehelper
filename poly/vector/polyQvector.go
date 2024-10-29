@@ -7,8 +7,8 @@ import (
 	"math"
 	"strings"
 
-	"cyber.ee/pq/devkit"
-	"cyber.ee/pq/devkit/poly"
+	"cyber.ee/pq/latticehelper"
+	"cyber.ee/pq/latticehelper/poly"
 	"github.com/raszia/gotiny"
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
@@ -57,7 +57,7 @@ func NewZeroPolyQVector(length int) PolyQVector {
 	return vec
 }
 
-// Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+// Make sure sampler is not used concurrently. If needed, created new with latticehelper.GetSampler()
 // If sampler is nil, default one will be used
 func NewRandomPolyQVector(sampler *ring.UniformSampler, length int) PolyQVector {
 	vec := make(PolyQVector, length)
@@ -147,7 +147,7 @@ func (vec PolyQVector) Length() int {
 }
 
 func (vec PolyQVector) Listize() []int64 {
-	listizedVec := make([]int64, 0, vec.Length()*devkit.MainRing.N())
+	listizedVec := make([]int64, 0, vec.Length()*latticehelper.MainRing.N())
 	for _, currentPoly := range vec {
 		listizedVec = append(listizedVec, currentPoly.Listize()...)
 	}
@@ -168,7 +168,7 @@ func (vec PolyQVector) InfiniteNorm() int64 {
 func (vec PolyQVector) SecondNorm() float64 {
 	sum := int64(0)
 	for _, currentPoly := range vec {
-		sum += devkit.Pow(currentPoly.InfiniteNorm(), 2)
+		sum += latticehelper.Pow(currentPoly.InfiniteNorm(), 2)
 	}
 	return math.Sqrt(float64(sum))
 }
@@ -233,15 +233,15 @@ func (vec PolyQVector) DotProduct(inputPolyQVector PolyQVector) poly.PolyQ {
 	newPoly := poly.NewPolyQ()
 
 	for i := 0; i < vec.Length(); i++ {
-		devkit.MainRing.NTT(vec[i].Poly, vec[i].Poly)
-		devkit.MainRing.NTT(inputPolyQVector[i].Poly, inputPolyQVector[i].Poly)
+		latticehelper.MainRing.NTT(vec[i].Poly, vec[i].Poly)
+		latticehelper.MainRing.NTT(inputPolyQVector[i].Poly, inputPolyQVector[i].Poly)
 
-		devkit.MainRing.MulCoeffsBarrettThenAdd(vec[i].Poly, inputPolyQVector[i].Poly, newPoly.Poly)
+		latticehelper.MainRing.MulCoeffsBarrettThenAdd(vec[i].Poly, inputPolyQVector[i].Poly, newPoly.Poly)
 
-		devkit.MainRing.INTT(vec[i].Poly, vec[i].Poly)
-		devkit.MainRing.INTT(inputPolyQVector[i].Poly, inputPolyQVector[i].Poly)
+		latticehelper.MainRing.INTT(vec[i].Poly, vec[i].Poly)
+		latticehelper.MainRing.INTT(inputPolyQVector[i].Poly, inputPolyQVector[i].Poly)
 	}
-	devkit.MainRing.INTT(newPoly.Poly, newPoly.Poly)
+	latticehelper.MainRing.INTT(newPoly.Poly, newPoly.Poly)
 
 	return newPoly
 }

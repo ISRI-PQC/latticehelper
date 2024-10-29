@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/latticehelper"
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
 
@@ -18,43 +18,43 @@ type PolyQ struct {
 }
 
 func NewPolyQFromCoeffs(coeffs ...int64) PolyQ {
-	ret := devkit.MainRing.AtLevel(devkit.MainRing.Level()).NewPoly()
+	ret := latticehelper.MainRing.AtLevel(latticehelper.MainRing.Level()).NewPoly()
 
-	newCoeffs := make([]*big.Int, devkit.MainRing.N())
+	newCoeffs := make([]*big.Int, latticehelper.MainRing.N())
 
 	for i, coeff := range coeffs {
 		newCoeffs[i] = new(big.Int).SetInt64(coeff)
 	}
 
-	for i := len(coeffs); i < devkit.MainRing.N(); i++ {
+	for i := len(coeffs); i < latticehelper.MainRing.N(); i++ {
 		newCoeffs[i] = big.NewInt(0)
 	}
 
-	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret)
+	latticehelper.MainRing.SetCoefficientsBigint(newCoeffs, ret)
 
 	return PolyQ{ret}
 }
 
 func NewPolyQ() PolyQ {
-	ret := devkit.MainRing.AtLevel(devkit.MainRing.Level()).NewPoly()
+	ret := latticehelper.MainRing.AtLevel(latticehelper.MainRing.Level()).NewPoly()
 	return PolyQ{ret}
 }
 
 func NewConstantPolyQ(constant int64) PolyQ {
 	ret := NewPolyQ()
 
-	constant = devkit.PositiveMod(constant, devkit.MainRing.Modulus().Int64())
+	constant = latticehelper.PositiveMod(constant, latticehelper.MainRing.Modulus().Int64())
 
-	ret.Coeffs[devkit.MainRing.Level()][0] = uint64(constant)
+	ret.Coeffs[latticehelper.MainRing.Level()][0] = uint64(constant)
 
 	return ret
 }
 
-// Make sure sampler is not used concurrently. If needed, created new with devkit.GetSampler()
+// Make sure sampler is not used concurrently. If needed, created new with latticehelper.GetSampler()
 // If sampler is nil, default one will be used
 func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
 	if sampler == nil {
-		sampler = devkit.DefaultUniformSampler
+		sampler = latticehelper.DefaultUniformSampler
 	}
 
 	ret := sampler.ReadNew()
@@ -63,8 +63,8 @@ func NewRandomPolyQ(sampler *ring.UniformSampler) PolyQ {
 
 // Input nil seed to use random seed, otherwise, only first 32 bytes from seed will be used!
 func NewRandomPolyQWithMaxInfNorm(seed []byte, maxInfNorm int64) PolyQ {
-	ret := devkit.MainRing.NewPoly()
-	newCoeffs := make([]*big.Int, devkit.MainRing.N())
+	ret := latticehelper.MainRing.NewPoly()
+	newCoeffs := make([]*big.Int, latticehelper.MainRing.N())
 
 	var r *rand.Rand
 
@@ -88,7 +88,7 @@ func NewRandomPolyQWithMaxInfNorm(seed []byte, maxInfNorm int64) PolyQ {
 		newCoeffs[i] = big.NewInt(c)
 	}
 
-	devkit.MainRing.SetCoefficientsBigint(newCoeffs, ret)
+	latticehelper.MainRing.SetCoefficientsBigint(newCoeffs, ret)
 
 	return PolyQ{ret}
 }
@@ -115,7 +115,7 @@ func (poly PolyQ) CoeffString() string {
 }
 
 func (poly PolyQ) String() string {
-	coeffs := poly.Poly.Coeffs[devkit.MainRing.Level()]
+	coeffs := poly.Poly.Coeffs[latticehelper.MainRing.Level()]
 	ret := make([]string, 0, len(coeffs)+1)
 
 	if containsOnlyZeroes(coeffs) {
@@ -148,7 +148,7 @@ func (poly PolyQ) String() string {
 func (coeffs PolyQ) NonQ() Poly {
 	ret := NewPoly()
 
-	for i, coeff := range coeffs.Coeffs[devkit.MainRing.Level()] {
+	for i, coeff := range coeffs.Coeffs[latticehelper.MainRing.Level()] {
 		ret[i] = int64(coeff)
 	}
 
@@ -158,7 +158,7 @@ func (coeffs PolyQ) NonQ() Poly {
 func (poly PolyQ) InfiniteNorm() int64 {
 	max := int64(0)
 	for _, coeff := range poly.Listize() {
-		centeredCoeff := CenteredModulo(int64(coeff), devkit.MainRing.Modulus().Int64())
+		centeredCoeff := CenteredModulo(int64(coeff), latticehelper.MainRing.Modulus().Int64())
 
 		// We need absolute value
 		if centeredCoeff < 0 {
@@ -173,13 +173,13 @@ func (poly PolyQ) InfiniteNorm() int64 {
 }
 
 func (poly PolyQ) Length() int {
-	return devkit.MainRing.N()
+	return latticehelper.MainRing.N()
 }
 
 func (poly PolyQ) Listize() []int64 {
-	ret := make([]int64, len(poly.Poly.Coeffs[devkit.MainRing.Level()]))
+	ret := make([]int64, len(poly.Poly.Coeffs[latticehelper.MainRing.Level()]))
 	for i := 0; i < len(ret); i++ {
-		ret[i] = int64(poly.Poly.Coeffs[devkit.MainRing.Level()][i])
+		ret[i] = int64(poly.Poly.Coeffs[latticehelper.MainRing.Level()][i])
 	}
 	return ret
 }
@@ -188,7 +188,7 @@ func (poly *PolyQ) ApplyToEveryCoeff(f func(int64) any) {
 	newCoeffs := make([]*big.Int, poly.Length())
 
 	for i := 0; i < poly.Length(); i++ {
-		c := f(int64(poly.Coeffs[devkit.MainRing.Level()][i]))
+		c := f(int64(poly.Coeffs[latticehelper.MainRing.Level()][i]))
 		switch t := c.(type) {
 		case int64:
 			newCoeffs[i] = new(big.Int).SetInt64(t)
@@ -199,17 +199,17 @@ func (poly *PolyQ) ApplyToEveryCoeff(f func(int64) any) {
 		}
 	}
 
-	devkit.MainRing.SetCoefficientsBigint(newCoeffs, poly.Poly)
+	latticehelper.MainRing.SetCoefficientsBigint(newCoeffs, poly.Poly)
 }
 
 func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
 	r1coeffs := make([]int64, poly.Length())
 	r0coeffs := make([]int64, poly.Length())
 
-	for i, coeff := range poly.Coeffs[devkit.MainRing.Level()] {
-		centered := CenteredModulo(int64(coeff), devkit.Pow(2, d))
+	for i, coeff := range poly.Coeffs[latticehelper.MainRing.Level()] {
+		centered := CenteredModulo(int64(coeff), latticehelper.Pow(2, d))
 
-		r1coeffs[i] = devkit.FloorDivision(int64(coeff)-centered, devkit.Pow(2, d))
+		r1coeffs[i] = latticehelper.FloorDivision(int64(coeff)-centered, latticehelper.Pow(2, d))
 		r0coeffs[i] = centered
 	}
 
@@ -222,8 +222,8 @@ func (poly PolyQ) Power2Round(d int64) (PolyQ, PolyQ) {
 func (poly PolyQ) HighBits(alpha int64) PolyQ {
 	ret := poly.CopyNew()
 
-	for i, coeff := range poly.Coeffs[devkit.MainRing.Level()] {
-		ret.Coeffs[devkit.MainRing.Level()][i] = uint64(highBits(int64(coeff), alpha, devkit.MainRing.Modulus().Int64()))
+	for i, coeff := range poly.Coeffs[latticehelper.MainRing.Level()] {
+		ret.Coeffs[latticehelper.MainRing.Level()][i] = uint64(highBits(int64(coeff), alpha, latticehelper.MainRing.Modulus().Int64()))
 	}
 
 	return PolyQ{*ret}
@@ -231,25 +231,25 @@ func (poly PolyQ) HighBits(alpha int64) PolyQ {
 
 func (poly PolyQ) Neg() PolyQ {
 	retPoly := NewPolyQ()
-	devkit.MainRing.Neg(poly.Poly, retPoly.Poly)
+	latticehelper.MainRing.Neg(poly.Poly, retPoly.Poly)
 	return retPoly
 }
 
 func (poly PolyQ) Add(inputPolyQ PolyQ) PolyQ {
 	retPoly := NewPolyQ()
-	devkit.MainRing.Add(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
+	latticehelper.MainRing.Add(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
 	return retPoly
 
 }
 
 func (poly PolyQ) Sub(inputPolyQ PolyQ) PolyQ {
 	retPoly := NewPolyQ()
-	devkit.MainRing.Sub(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
+	latticehelper.MainRing.Sub(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
 	return retPoly
 }
 
 func (poly PolyQ) Mul(inputPolyQ PolyQ) PolyQ {
-	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
+	r := latticehelper.MainRing.AtLevel(latticehelper.MainRing.Level())
 
 	polyNTT := r.NewPoly()
 	inputNTT := r.NewPoly()
@@ -278,7 +278,7 @@ func (poly PolyQ) Pow(exp int64) PolyQ {
 		}
 
 		poly = poly.Mul(PolyQ{*poly.CopyNew()})
-		exp = devkit.FloorDivision(exp, 2)
+		exp = latticehelper.FloorDivision(exp, 2)
 	}
 
 	return g
@@ -287,9 +287,9 @@ func (poly PolyQ) Pow(exp int64) PolyQ {
 func (poly PolyQ) ScaledByInt(scalar int64) PolyQ {
 	retPoly := NewPolyQ()
 
-	sc := devkit.PositiveMod(scalar, devkit.MainRing.Modulus().Int64())
+	sc := latticehelper.PositiveMod(scalar, latticehelper.MainRing.Modulus().Int64())
 
-	devkit.MainRing.MulScalar(poly.Poly, uint64(sc), retPoly.Poly)
+	latticehelper.MainRing.MulScalar(poly.Poly, uint64(sc), retPoly.Poly)
 
 	return retPoly
 }
@@ -297,15 +297,15 @@ func (poly PolyQ) ScaledByInt(scalar int64) PolyQ {
 func (poly PolyQ) AddedToFirstCoeff(input int64) PolyQ {
 	retPoly := *poly.CopyNew()
 
-	inputQ := devkit.PositiveMod(input, devkit.MainRing.Modulus().Int64())
+	inputQ := latticehelper.PositiveMod(input, latticehelper.MainRing.Modulus().Int64())
 
 	addPoly := NewConstantPolyQ(inputQ)
 
-	devkit.MainRing.Add(retPoly, addPoly.Poly, retPoly)
+	latticehelper.MainRing.Add(retPoly, addPoly.Poly, retPoly)
 
 	return PolyQ{retPoly}
 }
 
 func (poly PolyQ) Equals(other PolyQ) bool {
-	return devkit.MainRing.Equal(poly.Poly, other.Poly)
+	return latticehelper.MainRing.Equal(poly.Poly, other.Poly)
 }

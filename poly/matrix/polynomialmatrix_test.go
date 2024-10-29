@@ -3,11 +3,11 @@ package matrix
 import (
 	"testing"
 
-	"cyber.ee/pq/devkit"
+	"cyber.ee/pq/latticehelper"
 )
 
 func TestMain(m *testing.M) {
-	devkit.InitSingle(128, 4294954753)
+	latticehelper.InitSingle(128, 4294954753)
 	m.Run()
 }
 
@@ -22,7 +22,7 @@ func TestPolyMatrixSerialize(t *testing.T) {
 	}
 }
 func TestPolyQMatrixSerialize(t *testing.T) {
-	p := NewRandomPolyQMatrix(devkit.DefaultUniformSampler, 5, 25)
+	p := NewRandomPolyQMatrix(latticehelper.DefaultUniformSampler, 5, 25)
 	b := p.Serialize()
 
 	n := DeserializePolyQMatrix(b)

@@ -1,4 +1,4 @@
-package devkit
+package latticehelper
 
 import (
 	"math/big"

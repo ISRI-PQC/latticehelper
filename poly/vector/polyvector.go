@@ -4,8 +4,8 @@ import (
 	"log"
 	"strings"
 
-	"cyber.ee/pq/devkit"
-	"cyber.ee/pq/devkit/poly"
+	"cyber.ee/pq/latticehelper"
+	"cyber.ee/pq/latticehelper/poly"
 	"github.com/raszia/gotiny"
 )
 
@@ -101,7 +101,7 @@ func (vec PolyVector) Length() int {
 }
 
 func (vec PolyVector) Listize() []int64 {
-	listizedVec := make([]int64, 0, vec.Length()*devkit.MainRing.N())
+	listizedVec := make([]int64, 0, vec.Length()*latticehelper.MainRing.N())
 	for _, currentPoly := range vec {
 		listizedVec = append(listizedVec, currentPoly.Listize()...)
 	}

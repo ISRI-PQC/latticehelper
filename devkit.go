@@ -1,4 +1,4 @@
-package devkit
+package latticehelper
 
 import (
 	"github.com/tuneinsight/lattigo/v5/ring"

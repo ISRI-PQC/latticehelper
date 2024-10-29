@@ -1,14 +1,14 @@
 package matrix
 
 import (
-	"cyber.ee/pq/devkit"
-	"cyber.ee/pq/devkit/poly"
+	"cyber.ee/pq/latticehelper"
+	"cyber.ee/pq/latticehelper/poly"
 )
 
 // Used to get polynomial matrices to integer matrices while
 // preserving the structure
 func toeplitz(input poly.PolyQ) [][]int64 {
-	flist := input.Poly.Coeffs[devkit.MainRing.Level()]
+	flist := input.Poly.Coeffs[latticehelper.MainRing.Level()]
 	F := make([][]int64, len(flist))
 	for i := 0; i < len(flist); i++ {
 		F[i] = make([]int64, len(flist))
@@ -38,16 +38,16 @@ func BigToeplitz(A PolyQMatrix, m, n int) [][]int64 {
 		}
 	}
 
-	result := make([][]int64, m*devkit.MainRing.N())
+	result := make([][]int64, m*latticehelper.MainRing.N())
 
-	for row := 0; row < m*devkit.MainRing.N(); row++ {
-		result[row] = make([]int64, n*devkit.MainRing.N())
-		for col := 0; col < n*devkit.MainRing.N(); col++ {
-			result[row][col] = source[devkit.FloorDivision(
-				int64(row), int64(devkit.MainRing.N()),
-			)][devkit.FloorDivision(
-				int64(col), int64(devkit.MainRing.N()),
-			)][row%devkit.MainRing.N()][col%devkit.MainRing.N()]
+	for row := 0; row < m*latticehelper.MainRing.N(); row++ {
+		result[row] = make([]int64, n*latticehelper.MainRing.N())
+		for col := 0; col < n*latticehelper.MainRing.N(); col++ {
+			result[row][col] = source[latticehelper.FloorDivision(
+				int64(row), int64(latticehelper.MainRing.N()),
+			)][latticehelper.FloorDivision(
+				int64(col), int64(latticehelper.MainRing.N()),
+			)][row%latticehelper.MainRing.N()][col%latticehelper.MainRing.N()]
 		}
 	}
 
