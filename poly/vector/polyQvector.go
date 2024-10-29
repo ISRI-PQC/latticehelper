@@ -173,10 +173,10 @@ func (vec PolyQVector) SecondNorm() float64 {
 	return math.Sqrt(float64(sum))
 }
 
-func (vec PolyQVector) ScaledByPolyProxy(inputPolyProxy poly.Polynomial) PolyQVector {
+func (vec PolyQVector) ScaledByPolyQ(inputPoly poly.PolyQ) PolyQVector {
 	newVec := make(PolyQVector, vec.Length())
 	for i, currentPoly := range vec {
-		newVec[i] = currentPoly.Mul(inputPolyProxy)
+		newVec[i] = currentPoly.Mul(inputPoly)
 	}
 
 	return newVec
@@ -191,16 +191,7 @@ func (vec PolyQVector) ScaledByInt(input int64) PolyQVector {
 	return newVec
 }
 
-func (vec PolyQVector) Add(inputPolyProxyVector PolynomialVector) PolyQVector {
-	var inputPolyQVector PolyQVector
-
-	switch input := inputPolyProxyVector.(type) {
-	case PolyQVector:
-		inputPolyQVector = input
-	case PolyVector:
-		inputPolyQVector = input.TransformedToPolyQVector()
-	}
-
+func (vec PolyQVector) Add(inputPolyQVector PolyQVector) PolyQVector {
 	if vec.Length() != inputPolyQVector.Length() {
 		log.Panic("Add: length of input vector is not equal to length of vector")
 	}
@@ -212,16 +203,7 @@ func (vec PolyQVector) Add(inputPolyProxyVector PolynomialVector) PolyQVector {
 	return newVec
 }
 
-func (vec PolyQVector) Sub(inputPolyProxyVector PolynomialVector) PolyQVector {
-	var inputPolyQVector PolyQVector
-
-	switch input := inputPolyProxyVector.(type) {
-	case PolyQVector:
-		inputPolyQVector = input
-	case PolyVector:
-		inputPolyQVector = input.TransformedToPolyQVector()
-	}
-
+func (vec PolyQVector) Sub(inputPolyQVector PolyQVector) PolyQVector {
 	if vec.Length() != inputPolyQVector.Length() {
 		log.Panic("Sub: length of input vector is not equal to length of vector")
 	}
@@ -233,16 +215,7 @@ func (vec PolyQVector) Sub(inputPolyProxyVector PolynomialVector) PolyQVector {
 	return newVec
 }
 
-func (vec PolyQVector) Concat(inputPolyProxyVector PolynomialVector) PolyQVector {
-	var inputPolyQVector PolyQVector
-
-	switch input := inputPolyProxyVector.(type) {
-	case PolyQVector:
-		inputPolyQVector = input
-	case PolyVector:
-		inputPolyQVector = input.TransformedToPolyQVector()
-	}
-
+func (vec PolyQVector) Concat(inputPolyQVector PolyQVector) PolyQVector {
 	newVec := make(PolyQVector, 0, vec.Length()+inputPolyQVector.Length())
 
 	newVec = append(newVec, vec...)
@@ -251,15 +224,7 @@ func (vec PolyQVector) Concat(inputPolyProxyVector PolynomialVector) PolyQVector
 	return newVec
 }
 
-func (vec PolyQVector) DotProduct(inputPolyProxyVector PolynomialVector) poly.PolyQ {
-	var inputPolyQVector PolyQVector
-
-	switch input := inputPolyProxyVector.(type) {
-	case PolyQVector:
-		inputPolyQVector = input
-	case PolyVector:
-		inputPolyQVector = input.TransformedToPolyQVector()
-	}
+func (vec PolyQVector) DotProduct(inputPolyQVector PolyQVector) poly.PolyQ {
 
 	if inputPolyQVector.Length() != vec.Length() {
 		log.Panic("DotProduct: two vectors don't have the same length.")

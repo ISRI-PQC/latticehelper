@@ -18,7 +18,7 @@ type PolyQ struct {
 }
 
 func NewPolyQFromCoeffs(coeffs ...int64) PolyQ {
-	ret := devkit.MainRing.NewPoly()
+	ret := devkit.MainRing.AtLevel(devkit.MainRing.Level()).NewPoly()
 
 	newCoeffs := make([]*big.Int, devkit.MainRing.N())
 
@@ -36,7 +36,7 @@ func NewPolyQFromCoeffs(coeffs ...int64) PolyQ {
 }
 
 func NewPolyQ() PolyQ {
-	ret := devkit.MainRing.NewPoly()
+	ret := devkit.MainRing.AtLevel(devkit.MainRing.Level()).NewPoly()
 	return PolyQ{ret}
 }
 
@@ -235,48 +235,20 @@ func (poly PolyQ) Neg() PolyQ {
 	return retPoly
 }
 
-func (poly PolyQ) Add(inputPolynomial Polynomial) PolyQ {
-	var inputPolyQ PolyQ
-
-	switch input := inputPolynomial.(type) {
-	case PolyQ:
-		inputPolyQ = input
-	case Poly:
-		inputPolyQ = input.TransformedToPolyQ()
-	}
-
+func (poly PolyQ) Add(inputPolyQ PolyQ) PolyQ {
 	retPoly := NewPolyQ()
 	devkit.MainRing.Add(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
-
 	return retPoly
 
 }
 
-func (poly PolyQ) Sub(inputPolynomial Polynomial) PolyQ {
-	var inputPolyQ PolyQ
-
-	switch input := inputPolynomial.(type) {
-	case PolyQ:
-		inputPolyQ = input
-	case Poly:
-		inputPolyQ = input.TransformedToPolyQ()
-	}
-
+func (poly PolyQ) Sub(inputPolyQ PolyQ) PolyQ {
 	retPoly := NewPolyQ()
 	devkit.MainRing.Sub(poly.Poly, inputPolyQ.Poly, retPoly.Poly)
-
 	return retPoly
 }
 
-func (poly PolyQ) Mul(inputPolynomial Polynomial) PolyQ {
-	var inputPolyQ PolyQ
-
-	switch input := inputPolynomial.(type) {
-	case PolyQ:
-		inputPolyQ = input
-	case Poly:
-		inputPolyQ = input.TransformedToPolyQ()
-	}
+func (poly PolyQ) Mul(inputPolyQ PolyQ) PolyQ {
 	r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
 
 	polyNTT := r.NewPoly()

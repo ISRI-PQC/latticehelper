@@ -162,48 +162,24 @@ func (coeffs Poly) Neg() Poly {
 	return ret
 }
 
-func (coeffs Poly) Add(inputPolynomial Polynomial) Polynomial {
-	switch input := inputPolynomial.(type) {
-	case Poly:
-		ret := make(Poly, devkit.MainRing.N())
-		for i, coeff := range coeffs {
-			ret[i] = coeff + input[i]
-		}
-		return ret
-	case PolyQ:
-		return coeffs.TransformedToPolyQ().Add(input)
-	default:
-		log.Panic("Invalid PolyProxy")
-		return nil
+func (coeffs Poly) Add(inputPoly Poly) Poly {
+	ret := make(Poly, devkit.MainRing.N())
+	for i, coeff := range coeffs {
+		ret[i] = coeff + inputPoly[i]
 	}
+	return ret
 }
 
-func (coeffs Poly) Sub(inputPolynomial Polynomial) Polynomial {
-	switch input := inputPolynomial.(type) {
-	case Poly:
-		ret := make(Poly, devkit.MainRing.N())
-		for i, coeff := range coeffs {
-			ret[i] = coeff - input[i]
-		}
-		return ret
-	case PolyQ:
-		return coeffs.TransformedToPolyQ().Sub(input)
-	default:
-		log.Panic("Invalid PolyProxy")
-		return nil
+func (coeffs Poly) Sub(inputPoly Poly) Poly {
+	ret := make(Poly, devkit.MainRing.N())
+	for i, coeff := range coeffs {
+		ret[i] = coeff - inputPoly[i]
 	}
+	return ret
 }
 
-func (coeffs Poly) Mul(inputPolynomial Polynomial) Polynomial {
-	switch input := inputPolynomial.(type) {
-	case Poly:
-		return Poly(schoolbookMultiplication(coeffs, input))
-	case PolyQ:
-		return coeffs.TransformedToPolyQ().Mul(input)
-	default:
-		log.Panic("Invalid PolyProxy")
-		return nil
-	}
+func (coeffs Poly) Mul(inputPoly Poly) Poly {
+	return Poly(schoolbookMultiplication(coeffs, inputPoly))
 }
 
 func (coeffs Poly) Pow(exp int64) Poly {
@@ -215,10 +191,10 @@ func (coeffs Poly) Pow(exp int64) Poly {
 
 	for exp > 0 {
 		if exp%2 == 1 {
-			g = g.Mul(coeffs).(Poly)
+			g = g.Mul(coeffs)
 		}
 
-		coeffs = coeffs.Mul(coeffs).(Poly)
+		coeffs = coeffs.Mul(coeffs)
 		exp = devkit.FloorDivision(exp, 2)
 	}
 
@@ -233,9 +209,10 @@ func (coeffs Poly) ScaledByInt(scalar int64) Poly {
 	return ret
 }
 
-func (coeffs *Poly) AddedToFirstCoeff(input int64) *Poly {
-	ret := coeffs
-	(*ret)[0] += input
+func (coeffs Poly) AddedToFirstCoeff(input int64) Poly {
+	ret := make(Poly, devkit.MainRing.N())
+	copy(ret, coeffs)
+	ret[0] += input
 	return ret
 }
 

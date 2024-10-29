@@ -143,27 +143,12 @@ func (mat PolyMatrix) Transposed() PolyMatrix {
 	return result
 }
 
-func (mat PolyMatrix) ScaledByPolyProxy(inputPoly poly.Polynomial) PolynomialMatrix {
-	switch input := inputPoly.(type) {
-	case poly.Poly:
-		ret := make(PolyMatrix, mat.Rows())
-		for i, polyVector := range mat {
-			ret[i] = polyVector.ScaledByPolyProxy(input).(vector.PolyVector)
-		}
-		return PolyMatrix(ret)
-	case poly.PolyQ:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		newMat := make(PolyQMatrix, mat.Rows())
-
-		for i, polyQVec := range currentPolyQMatrix {
-			newMat[i] = polyQVec.ScaledByPolyProxy(input)
-		}
-		return newMat
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
+func (mat PolyMatrix) ScaledByPoly(inputPoly poly.Poly) PolyMatrix {
+	ret := make(PolyMatrix, mat.Rows())
+	for i, polyVector := range mat {
+		ret[i] = polyVector.ScaledByPoly(inputPoly)
 	}
+	return PolyMatrix(ret)
 }
 
 func (mat PolyMatrix) ScaledByInt(input int64) PolyMatrix {
@@ -176,228 +161,97 @@ func (mat PolyMatrix) ScaledByInt(input int64) PolyMatrix {
 	return PolyMatrix(result)
 }
 
-func (mat PolyMatrix) Add(inputPolyProxyMat PolynomialMatrix) PolynomialMatrix {
-	if mat.Cols() != inputPolyProxyMat.Cols() || mat.Rows() != inputPolyProxyMat.Rows() {
+func (mat PolyMatrix) Add(inputPolyMatrix PolyMatrix) PolyMatrix {
+	if mat.Cols() != inputPolyMatrix.Cols() || mat.Rows() != inputPolyMatrix.Rows() {
 		log.Panic("Add: rows and cols of matrices are not equal")
 	}
-
-	switch input := inputPolyProxyMat.(type) {
-	case PolyMatrix:
-		ret := make(PolyMatrix, mat.Rows())
-		for i, polyVec := range mat {
-			ret[i] = polyVec.Add(input[i]).(vector.PolyVector)
-		}
-		return PolyMatrix(ret)
-	case PolyQMatrix:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		newMat := make(PolyQMatrix, mat.Rows())
-
-		for i, polyQVec := range currentPolyQMatrix {
-			newMat[i] = polyQVec.Add(input[i])
-		}
-		return newMat
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
+	ret := make(PolyMatrix, mat.Rows())
+	for i, polyVec := range mat {
+		ret[i] = polyVec.Add(inputPolyMatrix[i])
 	}
+	return PolyMatrix(ret)
 }
 
-func (mat PolyMatrix) Sub(inputPolyProxyMat PolynomialMatrix) PolynomialMatrix {
-	if mat.Cols() != inputPolyProxyMat.Cols() || mat.Rows() != inputPolyProxyMat.Rows() {
+func (mat PolyMatrix) Sub(inputPolyMatrix PolyMatrix) PolyMatrix {
+	if mat.Cols() != inputPolyMatrix.Cols() || mat.Rows() != inputPolyMatrix.Rows() {
 		log.Panic("Sub: rows and cols of matrices are not equal")
 	}
 
-	switch input := inputPolyProxyMat.(type) {
-	case PolyMatrix:
-		ret := make(PolyMatrix, mat.Rows())
-		for i, polyVec := range mat {
-			ret[i] = polyVec.Sub(input[i]).(vector.PolyVector)
-		}
-		return PolyMatrix(ret)
-	case PolyQMatrix:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		newMat := make(PolyQMatrix, mat.Rows())
-
-		for i, polyQVec := range currentPolyQMatrix {
-			newMat[i] = polyQVec.Sub(input[i])
-		}
-		return newMat
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
+	ret := make(PolyMatrix, mat.Rows())
+	for i, polyVec := range mat {
+		ret[i] = polyVec.Sub(inputPolyMatrix[i])
 	}
+	return PolyMatrix(ret)
 }
 
-func (mat PolyMatrix) Concat(inputPolyProxyMat PolynomialMatrix) PolynomialMatrix {
-	if mat.Rows() != inputPolyProxyMat.Rows() {
+func (mat PolyMatrix) Concat(inputPolyMatrix PolyMatrix) PolyMatrix {
+	if mat.Rows() != inputPolyMatrix.Rows() {
 		log.Panic("Concat: rows of matrices are not equal")
 	}
 
-	switch input := inputPolyProxyMat.(type) {
-	case PolyMatrix:
-		ret := make(PolyMatrix, mat.Rows())
-		for i, polyVec := range mat {
-			ret[i] = polyVec.Concat(input[i]).(vector.PolyVector)
-		}
-		return PolyMatrix(ret)
-	case PolyQMatrix:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		newMat := make(PolyQMatrix, mat.Rows())
-
-		for i, polyQVec := range currentPolyQMatrix {
-			newMat[i] = polyQVec.Add(input[i])
-		}
-		return newMat
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
+	ret := make(PolyMatrix, mat.Rows())
+	for i, polyVec := range mat {
+		ret[i] = polyVec.Concat(inputPolyMatrix[i])
 	}
+	return PolyMatrix(ret)
 }
 
-func (mat PolyMatrix) BlockCombine(inputPolyProxyMat PolynomialMatrix) PolynomialMatrix {
-	if mat.Cols() != inputPolyProxyMat.Cols() {
+func (mat PolyMatrix) BlockCombine(inputPolyMatrix PolyMatrix) PolyMatrix {
+	if mat.Cols() != inputPolyMatrix.Cols() {
 		log.Panic("BlockCombine: cols of matrices are not equal")
 	}
 
-	switch input := inputPolyProxyMat.(type) {
-	case PolyMatrix:
-		ret := make(PolyMatrix, 0, mat.Rows()+inputPolyProxyMat.Rows())
-		ret = append(ret, mat...)
-		ret = append(ret, input...)
-		return PolyMatrix(ret)
-	case PolyQMatrix:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		newMat := make(PolyQMatrix, 0, mat.Rows()+input.Rows())
-		newMat = append(newMat, currentPolyQMatrix...)
-		newMat = append(newMat, input...)
-
-		return newMat
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
-	}
+	ret := make(PolyMatrix, 0, mat.Rows()+inputPolyMatrix.Rows())
+	ret = append(ret, mat...)
+	ret = append(ret, inputPolyMatrix...)
+	return PolyMatrix(ret)
 }
 
-func (mat PolyMatrix) MatMul(inputPolyProxyMat PolynomialMatrix) PolynomialMatrix {
-	if mat.Cols() != inputPolyProxyMat.Rows() {
+func (mat PolyMatrix) MatMul(inputPolyMatrix PolyMatrix) PolyMatrix {
+	if mat.Cols() != inputPolyMatrix.Rows() {
 		log.Panic("MatMul: Number of cols in first mat is not equal to number of rows in second mat")
 	}
 
-	switch input := inputPolyProxyMat.(type) {
-	case PolyMatrix:
-		inputPolyMatrix := input
+	rows, cols := mat.Rows(), mat.Cols()
+	otherCols := inputPolyMatrix.Cols()
 
-		rows, cols := mat.Rows(), mat.Cols()
-		otherCols := inputPolyMatrix.Cols()
+	newMat := make(PolyMatrix, rows)
 
-		newMat := make(PolyMatrix, rows)
+	for i := 0; i < rows; i++ {
+		currentVec := make(vector.PolyVector, otherCols)
 
-		for i := 0; i < rows; i++ {
-			currentVec := make(vector.PolyVector, otherCols)
+		for j := 0; j < otherCols; j++ {
+			currentPoly := poly.NewPoly()
 
-			for j := 0; j < otherCols; j++ {
-				currentPoly := poly.NewPoly()
-
-				for k := 0; k < cols; k++ {
-					currentPoly = currentPoly.Add(mat[i][k].Mul(inputPolyMatrix[k][j])).(poly.Poly)
-				}
-
-				currentVec[j] = currentPoly
+			for k := 0; k < cols; k++ {
+				currentPoly = currentPoly.Add(mat[i][k].Mul(inputPolyMatrix[k][j]))
 			}
-			newMat[i] = currentVec
+
+			currentVec[j] = currentPoly
 		}
-
-		return newMat
-	case PolyQMatrix:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		rows, cols := mat.Rows(), mat.Cols()
-		otherCols := input.Cols()
-
-		newMat := make(PolyQMatrix, rows)
-
-		r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
-
-		for i := 0; i < rows; i++ {
-			currentVec := make(vector.PolyQVector, otherCols)
-
-			for j := 0; j < otherCols; j++ {
-				currentPoly := poly.NewPolyQ()
-
-				for k := 0; k < cols; k++ {
-					matNTT := r.NewPoly()
-					inputNTT := r.NewPoly()
-
-					r.NTT(currentPolyQMatrix[i][k].Poly, matNTT)
-					r.NTT(input[k][j].Poly, inputNTT)
-
-					r.MulCoeffsBarrettThenAdd(
-						matNTT,
-						inputNTT,
-						currentPoly.Poly)
-				}
-
-				r.INTT(currentPoly.Poly, currentPoly.Poly)
-				currentVec[j] = currentPoly
-			}
-			newMat[i] = currentVec
-		}
-
-		return newMat
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
+		newMat[i] = currentVec
 	}
+
+	return newMat
 }
 
-func (mat PolyMatrix) VecMul(inputPolyProxyVector vector.PolynomialVector) vector.PolynomialVector {
-	if inputPolyProxyVector.Length() != mat.Cols() {
+func (mat PolyMatrix) VecMul(inputPolyVector vector.PolyVector) vector.PolyVector {
+	if inputPolyVector.Length() != mat.Cols() {
 		log.Panic("VecMul: vectors don't have the same length")
 	}
 
-	switch input := inputPolyProxyVector.(type) {
-	case vector.PolyVector:
-		ret := make(vector.PolyVector, mat.Rows())
+	ret := make(vector.PolyVector, mat.Rows())
 
-		for i := 0; i < len(ret); i++ {
-			currentPoly := make(poly.Poly, mat[0][0].Length())
+	for i := 0; i < len(ret); i++ {
+		currentPoly := make(poly.Poly, mat[0][0].Length())
 
-			for j := 0; j < inputPolyProxyVector.Length(); j++ {
-				currentPoly = currentPoly.Add(input[j].Mul(mat[i][j])).(poly.Poly)
-			}
-
-			ret[i] = currentPoly
-		}
-		return ret
-	case vector.PolyQVector:
-		currentPolyQMatrix := mat.TransformedToPolyQMatrix()
-
-		newVec := make(vector.PolyQVector, currentPolyQMatrix.Rows())
-		r := devkit.MainRing.AtLevel(devkit.MainRing.Level())
-
-		for i := 0; i < currentPolyQMatrix.Rows(); i++ {
-			currentPoly := poly.NewPolyQ()
-
-			for j := 0; j < inputPolyProxyVector.Length(); j++ {
-				matNTT := r.NewPoly()
-				inputNTT := r.NewPoly()
-
-				r.MulCoeffsBarrettThenAdd(inputNTT, matNTT, currentPoly.Poly)
-			}
-
-			r.INTT(currentPoly.Poly, currentPoly.Poly)
-			newVec[i] = currentPoly
+		for j := 0; j < inputPolyVector.Length(); j++ {
+			currentPoly = currentPoly.Add(inputPolyVector[j].Mul(mat[i][j]))
 		}
 
-		return newVec
-	default:
-		log.Panic("Invalid PolyProxyMatrix.")
-		return nil
+		ret[i] = currentPoly
 	}
+	return ret
 }
 
 func (mat PolyMatrix) Equals(other PolyMatrix) bool {
