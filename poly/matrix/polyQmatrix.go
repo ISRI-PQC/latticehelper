@@ -105,10 +105,10 @@ func (mat PolyQMatrix) String() string {
 	return sb.String()
 }
 
-func (mat PolyQMatrix) TransformedToPolyMatrix() PolyMatrix {
+func (mat PolyQMatrix) NonQ() PolyMatrix {
 	polyMatrix := make(PolyMatrix, mat.Rows())
 	for i, polyQVector := range mat {
-		polyMatrix[i] = polyQVector.TransformedToPolyVector()
+		polyMatrix[i] = polyQVector.NonQ()
 	}
 	return polyMatrix
 }

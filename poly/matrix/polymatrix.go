@@ -82,10 +82,10 @@ func (mat PolyMatrix) String() string {
 	return sb.String()
 }
 
-func (mat PolyMatrix) TransformedToPolyQMatrix() PolyQMatrix {
+func (mat PolyMatrix) Q() PolyQMatrix {
 	polyQMatrix := make(PolyQMatrix, mat.Rows())
 	for i, polyVector := range mat {
-		polyQMatrix[i] = polyVector.TransformedToPolyQVector()
+		polyQMatrix[i] = polyVector.Q()
 	}
 	return polyQMatrix
 }

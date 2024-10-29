@@ -74,10 +74,10 @@ func (vec PolyVector) String() string {
 	return sb.String()
 }
 
-func (vec PolyVector) TransformedToPolyQVector() PolyQVector {
+func (vec PolyVector) Q() PolyQVector {
 	ret := make(PolyQVector, vec.Length())
 	for i, currentPoly := range vec {
-		ret[i] = currentPoly.TransformedToPolyQ()
+		ret[i] = currentPoly.Q()
 	}
 	return ret
 }

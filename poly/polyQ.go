@@ -145,7 +145,7 @@ func (poly PolyQ) String() string {
 	return strings.Join(ret, " + ")
 }
 
-func (coeffs PolyQ) TransformedToPoly() Poly {
+func (coeffs PolyQ) NonQ() Poly {
 	ret := NewPoly()
 
 	for i, coeff := range coeffs.Coeffs[devkit.MainRing.Level()] {

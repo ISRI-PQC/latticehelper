@@ -134,10 +134,10 @@ func (vec PolyQVector) String() string {
 	return sb.String()
 }
 
-func (vec PolyQVector) TransformedToPolyVector() PolyVector {
+func (vec PolyQVector) NonQ() PolyVector {
 	ret := make(PolyVector, vec.Length())
 	for i, currentPoly := range vec {
-		ret[i] = currentPoly.TransformedToPoly()
+		ret[i] = currentPoly.NonQ()
 	}
 	return ret
 }

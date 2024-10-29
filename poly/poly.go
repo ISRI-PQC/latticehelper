@@ -94,7 +94,7 @@ func (coeffs Poly) String() string {
 	return strings.Join(ret, " + ")
 }
 
-func (coeffs Poly) TransformedToPolyQ() PolyQ {
+func (coeffs Poly) Q() PolyQ {
 	ret := NewPolyQ()
 	newCoeffs := make([]*big.Int, devkit.MainRing.N())
 
