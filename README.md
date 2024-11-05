@@ -20,7 +20,9 @@ Under the hood, it is utilizing [LattiGo library](https://github.com/tuneinsight
 
 ## Initialization
 
-`latticehelper.InitSingle()` or `latticehelper.InitMultiple()` MUST be called at least once before using anything related to `polyQ`. Arguments are `d` and modulus `q`/moduli `\[q1, q2, q3,...\]`. `InitMultiple` can prepare parameters between multiple rings `Rq`, but has not been tested that much yet.
+`latticehelper.InitSingle()` or `latticehelper.InitMultiple()` MUST be called at least once before using anything related to `polyQ`. Arguments are `d` \+ single modulus `q`.
+
+`InitMultiple` can prepare parameters between multiple rings `Rq`, but has not been tested that much yet. Second argument must be a slice of moduli `[q1, q2, q3,...]`. 
 
 ## Concurrency
 
