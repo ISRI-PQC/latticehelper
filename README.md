@@ -18,6 +18,10 @@ Under the hood, it is utilizing [LattiGo library](https://github.com/tuneinsight
 - Vector and matrix arithmetic in both rings.
 - some util functions like Power2Round, checking bounds, norms, etc.
 
+## Install
+
+Use `go get github.com/isri-pqc/latticehelper` to download and use in your Go module.
+
 ## Initialization
 
 `latticehelper.InitSingle()` or `latticehelper.InitMultiple()` MUST be called at least once before using anything related to `polyQ`. Arguments for `latticehelper.InitSingle()` are maximum degree of polynomial `d` \+ single modulus `q`.

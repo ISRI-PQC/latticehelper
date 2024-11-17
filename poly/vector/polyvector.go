@@ -4,8 +4,8 @@ import (
 	"log"
 	"strings"
 
-	"cyber.ee/pq/latticehelper"
-	"cyber.ee/pq/latticehelper/poly"
+	"github.com/isri-pqc/latticehelper"
+	"github.com/isri-pqc/latticehelper/poly"
 	"github.com/raszia/gotiny"
 )
 

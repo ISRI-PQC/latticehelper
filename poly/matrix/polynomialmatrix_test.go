@@ -3,7 +3,7 @@ package matrix
 import (
 	"testing"
 
-	"cyber.ee/pq/latticehelper"
+	"github.com/isri-pqc/latticehelper"
 )
 
 func TestMain(m *testing.M) {

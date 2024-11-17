@@ -1,8 +1,8 @@
 package matrix
 
 import (
-	"cyber.ee/pq/latticehelper"
-	"cyber.ee/pq/latticehelper/poly"
+	"github.com/isri-pqc/latticehelper"
+	"github.com/isri-pqc/latticehelper/poly"
 )
 
 // Used to get polynomial matrices to integer matrices while

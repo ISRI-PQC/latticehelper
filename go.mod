@@ -1,4 +1,4 @@
-module cyber.ee/pq/latticehelper
+module github.com/isri-pqc/latticehelper
 
 go 1.22.2
 

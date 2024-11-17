@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cyber.ee/pq/latticehelper"
+	"github.com/isri-pqc/latticehelper"
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
 

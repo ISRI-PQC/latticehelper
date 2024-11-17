@@ -3,8 +3,8 @@ package vector
 import (
 	"testing"
 
-	"cyber.ee/pq/latticehelper"
-	"cyber.ee/pq/latticehelper/poly"
+	"github.com/isri-pqc/latticehelper"
+	"github.com/isri-pqc/latticehelper/poly"
 )
 
 func TestMain(m *testing.M) {

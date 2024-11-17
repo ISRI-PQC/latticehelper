@@ -3,7 +3,7 @@ package poly
 import (
 	"log"
 
-	"cyber.ee/pq/latticehelper"
+	"github.com/isri-pqc/latticehelper"
 )
 
 func CenteredModulo(x, q int64) int64 {

@@ -7,8 +7,8 @@ import (
 	"math"
 	"strings"
 
-	"cyber.ee/pq/latticehelper"
-	"cyber.ee/pq/latticehelper/poly"
+	"github.com/isri-pqc/latticehelper"
+	"github.com/isri-pqc/latticehelper/poly"
 	"github.com/raszia/gotiny"
 	"github.com/tuneinsight/lattigo/v5/ring"
 )
