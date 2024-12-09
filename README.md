@@ -42,7 +42,3 @@ Developed under [CHESS project](https://chess-eu.cs.ut.ee/).
 Funded by the European Union under Grant Agreement No. 101087529. Views and opinions expressed are however
 those of the author(s) only and do not necessarily reflect those of the European Union or European Research
 Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
-
-![](img/chess.png){width=40%}
-
-![](img/eu.png){width=40%}
