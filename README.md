@@ -33,3 +33,16 @@ Use `go get github.com/isri-pqc/latticehelper` to download and use in your Go mo
 If not stated otherwise, all functions should be thread safe and do not require any locks.
 
 Only exceptions to that rule are functions `NewRandomPolyQ{matrix|vector|""}`, which require a thread-unique sampler. If these functions are used concurrently (i.e. called multiple times at the same time), create new sampler in each thread by `latticehelper.NewSampler` for them.
+
+
+## Acknowledgements
+
+Developed under [CHESS project](https://chess-eu.cs.ut.ee/).
+
+![](img/chess.png)
+
+Funded by the European Union under Grant Agreement No. 101087529. Views and opinions expressed are however
+those of the author(s) only and do not necessarily reflect those of the European Union or European Research
+Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
+
+![](img/eu.png)
